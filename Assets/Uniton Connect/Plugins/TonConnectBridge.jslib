@@ -156,7 +156,7 @@ const tonConnectBridge = {
         
         initTonWeb: function()
         {
-            window.tonWeb = new TonWeb();
+            window.tonWeb = new TonWeb({ apiUrl: 'https://testnet.toncenter.com/api/v2/jsonRPC' });
         },
 
         openModal: async function(callback)

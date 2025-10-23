@@ -12,6 +12,7 @@ using UnitonConnect.Core.Utils;
 using UnitonConnect.Core.Utils.Debugging;
 using UnitonConnect.Runtime.Data;
 using UnitonConnect.Editor.Common;
+using System.Collections.Generic;
 
 namespace UnitonConnect.ThirdParty
 {
@@ -154,7 +155,8 @@ namespace UnitonConnect.ThirdParty
 
         private static string GetUserTonWalletUrl(string hexAddress)
         {
-            return $"https://tonapi.io/v2/accounts/{hexAddress}";
+            //return $"https://tonapi.io/v2/accounts/{hexAddress}";
+            return $"https://testnet.tonapi.io/v2/accounts/{hexAddress}";
         }
 
         private static string GetTransactionDataUrl(string transactionHash)

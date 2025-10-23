@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: dAppsRuntimeData
   m_EditorClassIdentifier: 
   <Data>k__BackingField:
-    <ProjectLink>k__BackingField: https://mrveit.github.io/Veittech-UnitonConnect
+    <ProjectLink>k__BackingField: https://songdang.github.io/build2/
     <ServerApiLink>k__BackingField: https://api.veittech.xyz
-    <Name>k__BackingField: Uniton Connect
+    <Name>k__BackingField: BlockChainGame
     <Icon>k__BackingField: {fileID: 2800000, guid: 6af0857c7eb6e7d48abf3aa74227d40a, type: 3}
