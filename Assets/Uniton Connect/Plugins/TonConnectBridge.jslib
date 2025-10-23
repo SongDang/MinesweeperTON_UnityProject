@@ -157,6 +157,7 @@ const tonConnectBridge = {
         initTonWeb: function()
         {
             window.tonWeb = new TonWeb({ apiUrl: 'https://testnet.toncenter.com/api/v2/jsonRPC' });
+            console.log('[Uniton Connect] Forced network: TESTNET');
         },
 
         openModal: async function(callback)
@@ -502,7 +503,6 @@ const tonConnectBridge = {
             nanoInTon, recipientAddress, message)
         {
             const tonWeb = window.tonWeb;
-
             var transactionData;
 
             if (!message || message === "CLEAR")
@@ -647,6 +647,11 @@ const tonConnectBridge = {
             const address = UTF8ToString(recipientAddress);
             const payloadMessage = UTF8ToString(message);
 
+            console.log("[Uniton Debug] Payload inputs:", {
+                nanotons,
+                address,
+                payloadMessage
+            });
             const transactionData = await tonConnect.getTonTransactionPayload(
                 nanotons, address, payloadMessage);
 
@@ -685,6 +690,7 @@ const tonConnectBridge = {
             }
             catch (error)
             {
+                console.error("[Uniton Debug] Transaction error:", error);
                 const errorPtr = tonConnect.allocString("");
 
                 {{{ makeDynCall('vi', 'callback') }}}(errorPtr);

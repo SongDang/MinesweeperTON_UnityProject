@@ -683,14 +683,22 @@ namespace UnitonConnect.Core
 
             if (string.IsNullOrEmpty(message))
             {
-                SendTonTransaction(tonInNanotons, 
-                    targetAddress, OnTonTransactionSend);
+                //chuyen bounceable
+                Utils.Address.ToBounceable(targetAddress, (bounceableAddress) => {
+                    SendTonTransaction(tonInNanotons, bounceableAddress, OnTonTransactionSend);
+                });
+
+                /*SendTonTransaction(tonInNanotons, 
+                    targetAddress, OnTonTransactionSend);*/
 
                 return;
             }
 
-            SendTonTransactionWithMessage(tonInNanotons, 
-                targetAddress, message, OnTonTransactionSend);
+            Utils.Address.ToBounceable(targetAddress, (bounceableAddress) => {
+                SendTonTransactionWithMessage(tonInNanotons, bounceableAddress, message, OnTonTransactionSend);
+            });
+            /*SendTonTransactionWithMessage(tonInNanotons, 
+                targetAddress, message, OnTonTransactionSend);*/
         }
 
         private static void SendJettonByParams(string senderJettonWalletContract, string gasFee,

@@ -161,7 +161,8 @@ namespace UnitonConnect.ThirdParty
 
         private static string GetTransactionDataUrl(string transactionHash)
         {
-            return $"https://tonapi.io/v2/blockchain/transactions/{transactionHash}";
+            //return $"https://tonapi.io/v2/blockchain/transactions/{transactionHash}";
+            return $"https://testnet.tonapi.io/v2/blockchain/transactions/{transactionHash}";
         }
 
         internal static string GetIconConvertURL(string apiUrl, string iconUrl)
