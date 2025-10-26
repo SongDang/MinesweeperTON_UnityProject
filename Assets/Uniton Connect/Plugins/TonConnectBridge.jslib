@@ -524,8 +524,9 @@ const tonConnectBridge = {
 
             let cellBuilder = new tonWeb.boc.Cell();
 
-            cellBuilder.bits.writeUint(0, 32);
-            cellBuilder.bits.writeString(message);
+            //cellBuilder.bits.writeUint(0, 32);
+            cellBuilder.bits.writeUint(0x4a25ce37, 32); 
+            //cellBuilder.bits.writeString(message);
                 
             let payload = tonWeb.utils.bytesToBase64(await cellBuilder.toBoc());
 
