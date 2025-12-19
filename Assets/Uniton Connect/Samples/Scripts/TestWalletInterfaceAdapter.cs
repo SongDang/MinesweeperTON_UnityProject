@@ -222,6 +222,14 @@ namespace UnitonConnect.Core.Demo
 
         private void WalletConnectionFinished(WalletConfig wallet)
         {
+            //test
+            Debug.Log("=== WALLET CONNECTION DEBUG ===");
+            Debug.Log($"Wallet config: {wallet}");
+            Debug.Log($"Wallet address: {wallet.Address}");
+            Debug.Log($"SDK IsWalletConnected: {_unitonSDK.IsWalletConnected}");
+            Debug.Log($"SDK Wallet object: {_unitonSDK.Wallet}");
+            Debug.Log($"_shortWalletAddress TextMeshPro: {_shortWalletAddress}");
+
             if (_unitonSDK.IsWalletConnected)
             {
                 var userAddress = wallet.Address;
@@ -237,9 +245,9 @@ namespace UnitonConnect.Core.Demo
 
                 Debug.Log($"Connected wallet short address: {shortWalletAddress}");
 
-                Debug.Log($"Connected address is user friendly: {_unitonSDK.Wallet.IsUserFriendly}");
-                Debug.Log($"Connected address is bounceable: {_unitonSDK.Wallet.IsBounceable}");
-                Debug.Log($"Connected address from testnet: {_unitonSDK.Wallet.IsTestOnly}");
+                //Debug.Log($"Connected address is user friendly: {_unitonSDK.Wallet.IsUserFriendly}");
+                //Debug.Log($"Connected address is bounceable: {_unitonSDK.Wallet.IsBounceable}");
+                //Debug.Log($"Connected address from testnet: {_unitonSDK.Wallet.IsTestOnly}");
 
                 _connectButton.interactable = false;
                 _disconnectButton.interactable = true;

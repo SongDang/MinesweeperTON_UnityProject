@@ -72,6 +72,8 @@ namespace UnitonConnect.ThirdParty
 
         internal static IEnumerator GetBalance(Action<long> walletBalanceClaimed)
         {
+            UnitonConnectLogger.LogError("TonApiBridge GetBalance, _walletAddress" + UNITON_CONNECT);
+            UnitonConnectLogger.LogError("TonApiBridge GetBalance, _walletAddress" + _walletAddress);
             var userEncodedAddress = ConvertAddressToEncodeURL(_walletAddress);
             var targetUrl = GetUserTonWalletUrl(userEncodedAddress);
 

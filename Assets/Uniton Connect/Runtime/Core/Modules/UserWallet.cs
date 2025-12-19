@@ -4,6 +4,7 @@ using UnitonConnect.Core.Utils.View;
 using UnitonConnect.Core.Utils.Debugging;
 
 using AddressUtils = UnitonConnect.Core.TonConnectBridge.Utils.Address;
+using UnityEngine;
 
 namespace UnitonConnect.Core.Common
 {
@@ -22,6 +23,11 @@ namespace UnitonConnect.Core.Common
         public UserWallet(string address,
             WalletConfig walletConfig)
         {
+            Debug.Log("UserWallet constructor, address: " + address);
+            Debug.Log("UserWallet constructor, walletConfig: " + walletConfig);
+            Debug.Log("UserWallet constructor, walletConfig.PublicKey: " + walletConfig.PublicKey);
+            Debug.Log("UserWallet constructor, address: " + walletConfig.StateInit);
+            Debug.Log("UserWallet constructor, address: " + walletConfig.Chain);
             _address = address;
 
             if (walletConfig == null)
@@ -41,6 +47,7 @@ namespace UnitonConnect.Core.Common
         /// <returns></returns>
         public sealed override string ToString()
         {
+            UnitonConnectLogger.LogWarning($"UserWallet ToString, _address" + _address);
             if (!IsAvaibleAddress())
             {
                 return string.Empty;

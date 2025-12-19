@@ -94,6 +94,11 @@ namespace UnitonConnect.Core
             string payload, Action<string> transactionSended);
 
         [DllImport("__Internal")]
+        private static extern void GetPlayerScore(
+            string playerAddress, 
+            Action<string> callback);
+
+        [DllImport("__Internal")]
         private static extern void SignData(
             string message, Action<string> messageSignFailed);
 
@@ -303,6 +308,14 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPlayerScoreCallback(string score)
+        {
+            UnitonConnectLogger.Log($"Player score received: {score}");
+            OnPlayerScoreReceived?.Invoke(score);
+            OnPlayerScoreReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnJettonTransactionSend(string parsedHash)
         {
             if (string.IsNullOrEmpty(parsedHash))
@@ -458,6 +471,8 @@ namespace UnitonConnect.Core
         private static Action<string> OnTonTransactionSended;
         private static Action<string> OnTonTransactionSendFailed;
 
+        private static Action<string> OnPlayerScoreReceived;
+
         private static Action<string> OnJettonTransactionSended;
         private static Action<string> OnJettonTransactionSendFailed;
 
@@ -538,6 +553,17 @@ namespace UnitonConnect.Core
         {
             SendTonByParams(recipientAddress, tonAmount, 
                 message, transactionSended, transactionSendFailed);
+        }
+
+        internal static void GetPlayerTotalScore(string playerAddress, Action<string> callback)
+        {
+            UnitonConnectLogger.Log("TonConnectBridge GetPlayerTotalScore");
+            OnPlayerScoreReceived = callback;
+
+            //GetPlayerScore(playerAddress, OnPlayerScoreCallback);
+            Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
+                GetPlayerScore(bounceableAddress, OnPlayerScoreCallback);
+            });
         }
 
         internal static void SendJetton(string senderJettonWalletContract, string gasFee, 

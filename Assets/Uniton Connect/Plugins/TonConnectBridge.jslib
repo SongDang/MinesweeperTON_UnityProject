@@ -1,8 +1,11 @@
+
 const tonConnectBridge = {
 
     // Class definition
 
     $tonConnect: {
+        CONTRACT_ADDRESS: "EQBqedp39NWpTSPz1WeFTUP4JrGJDLZxQiA9MbNXzqTPm4oR",
+
         allocString: function (stringData)
         {
             let ptr;
@@ -135,8 +138,11 @@ const tonConnectBridge = {
             return targetSignature;
         },
 
+
+
         init: function(manifestUrl, callback)
         {
+            console.log('[Uniton Connect] INIT CALLED - JSLIB IS LOADED!');
             const url = UTF8ToString(manifestUrl);
 
             window.tonConnectUI = new TON_CONNECT_UI.TonConnectUI(
@@ -700,6 +706,193 @@ const tonConnectBridge = {
             }
         },
 
+        
+        // GetPlayerTotalScore: /*async*/ function (playerAddressPtr, callback) 
+        // {
+        //     console.log(`[Uniton Connect] Get player score`);
+        //     const playerAddress = UTF8ToString(playerAddressPtr);
+        //     const tonWeb = window.tonWeb;
+
+        //     try {
+        //         const result = await tonWeb.provider.call2(CONTRACT_ADDRESS, 'get_score', [playerAddress]);
+        //         const score = parseInt(result.stack[0][1]);
+        //         const scoreStr = score.toString();
+        //         const strPtr = tonConnect.allocString(scoreStr);
+
+        //         console.log(`[Uniton Connect] Player ${playerAddress} score: ${scoreStr}`);
+
+        //         // Callback Unity (Action<string>)
+        //         {{{ makeDynCall('vs', 'callback') }}}(strPtr);
+
+        //         // giai phong vung nho
+        //         _free(strPtr);
+        //     } 
+        //     catch (error) {
+        //         console.error("GetScore failed:", error);
+
+        //         const errPtr = tonConnect.allocString("0");
+        //         {{{ makeDynCall('vs', 'callback') }}}(errPtr);
+        //         _free(errPtr);
+        //     }
+        // },
+        GetPlayerTotalScore: function (playerAddressPtr, callback) 
+        {
+            console.log('[Uniton Connect] GetPlayerTotalScore called');
+    
+            var playerAddress = UTF8ToString(playerAddressPtr);
+            var tonWeb = window.tonWeb;
+
+            if (!tonWeb) 
+            {
+                console.error('[Uniton Connect] TonWeb not initialized!');
+                 errPtr = tonConnect.allocString('0');
+                {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+                _free(errPtr);
+                return;
+            }
+
+            console.log('[Uniton Connect] Calling get_score for:', playerAddress);
+
+            // call get_score  
+            // try {
+            //     // Create address cell using TonWeb
+            //     var addressObj = new tonWeb.utils.Address(playerAddress);
+            //     var cell = new tonWeb.boc.Cell();
+            //     cell.bits.writeAddress(addressObj);
+        
+            //     // toBoc() is async, not bytesToBase64
+            //     cell.toBoc(false).then(function(bocBytes) 
+            //     {
+            //         var bocBase64 = tonWeb.utils.bytesToBase64(bocBytes);
+            //         console.log('[Uniton Connect] Address BOC:', bocBase64);
+            
+            //         // Now call the API with proper cell format
+            //         var apiUrl = 'https://testnet.toncenter.com/api/v2/runGetMethod';
+            //         var requestBody = JSON.stringify({
+            //             address: tonConnect.CONTRACT_ADDRESS,
+            //             method: 'get_score',
+            //             stack: [
+            //                 ["tvm.Cell", bocBase64]
+            //             ]
+            //         });
+
+            //         return fetch(apiUrl, {
+            //             method: 'POST',
+            //             headers: {
+            //                 'Content-Type': 'application/json'
+            //             },
+            //             body: requestBody
+            //         });
+            //     })
+            //     .then(function(response) {
+            //         return response.json();
+            //     })
+            //     .then(function(data) 
+            //     {
+            //         console.log('[Uniton Connect] Full API Response:', data);
+            
+            //         var score = 0;
+            //         if (data.ok && data.result && data.result.stack && data.result.stack.length > 0) 
+            //         {
+            //             var stackItem = data.result.stack[0];
+            //             console.log('[Uniton Connect] Stack item:', stackItem);
+                
+            //             if (stackItem[0] === 'num') {
+            //                 score = parseInt(stackItem[1], 16);
+            //             } else if (typeof stackItem === 'number') {
+            //                 score = stackItem;
+            //             }
+            //         } 
+            //         else if (!data.ok) 
+            //         {
+            //             console.error('[Uniton Connect] API Error:', data.error);
+            //         }
+            
+            //         var scoreStr = score.toString();
+            //         var strPtr = tonConnect.allocString(scoreStr);
+
+            //         console.log('[Uniton Connect] Final score:', scoreStr);
+            //         {{{ makeDynCall('vi', 'callback') }}}(strPtr);
+            //         _free(strPtr);
+            //     })
+            //     .catch(function(error) 
+            //     {
+            //         console.error('[Uniton Connect] GetScore error:', error);
+            //         var errPtr = tonConnect.allocString('0');
+            //         {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+            //         _free(errPtr);
+            //     });
+            // } 
+            // catch (error) 
+            // {
+            //     console.error('[Uniton Connect] Cell creation error:', error);
+            //     var errPtr = tonConnect.allocString('0');
+            //     {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+            //     _free(errPtr);
+            // }
+
+            // Create address cell - EXACTLY like the console test
+    var addressObj = new tonWeb.utils.Address(playerAddress);
+    var cell = new tonWeb.boc.Cell();
+    cell.bits.writeAddress(addressObj);
+    
+    cell.toBoc(false).then(function(bocBytes) {
+        var bocBase64 = tonWeb.utils.bytesToBase64(bocBytes);
+        console.log('[Uniton Connect] Address BOC:', bocBase64);
+        
+        var apiUrl = 'https://testnet.toncenter.com/api/v2/runGetMethod';
+        var requestBody = JSON.stringify({
+            address: tonConnect.CONTRACT_ADDRESS,
+            method: "get_score",
+            stack: [["tvm.Slice", bocBase64]]
+        });
+
+        console.log('[Uniton Connect] Request:', requestBody);
+
+        return fetch(apiUrl, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: requestBody
+        });
+    })
+    .then(function(response) {
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('[Uniton Connect] API Response:', data);
+        console.log('[Uniton Connect] Exit code:', data.result ? data.result.exit_code : 'N/A');
+        
+        var score = 0;
+        if (data.ok && data.result && data.result.exit_code === 0) {
+            if (data.result.stack && data.result.stack.length > 0) {
+                var stackItem = data.result.stack[0];
+                console.log('[Uniton Connect] Stack item:', stackItem);
+                
+                if (stackItem[0] === 'num') {
+                    score = parseInt(stackItem[1], 16);
+                    console.log('[Uniton Connect] Score (decimal):', score);
+                }
+            }
+        } else {
+            console.warn('[Uniton Connect] Failed - exit code:', data.result ? data.result.exit_code : 'N/A');
+        }
+        
+        var scoreStr = score.toString();
+        var strPtr = tonConnect.allocString(scoreStr);
+
+        console.log('[Uniton Connect] Returning to Unity:', scoreStr);
+        {{{ makeDynCall('vi', 'callback') }}}(strPtr);
+        _free(strPtr);
+    })
+    .catch(function(error) {
+        console.error('[Uniton Connect] Error:', error);
+        var errPtr = tonConnect.allocString('0');
+        {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+        _free(errPtr);
+    });
+        },
+
+
         convertBocToHashBase64: async function(claimedBoc)
         {
             const bocBytes = tonWeb.utils.base64ToBytes(claimedBoc);
@@ -718,7 +911,8 @@ const tonConnectBridge = {
             }
 
             const parsedAddress = tonConnect.parseAddress(address);
-            const bouceableAddress = parsedAddress.toString(true, true, true, false);
+            //const bouceableAddress = parsedAddress.toString(true, true, true, false);
+            const bouceableAddress = parsedAddress.toString(true, true, true, true);
 
             console.log(`[Uniton Connect] Address ${parsedAddress} converted `+
                 `to bounceable format: ${bouceableAddress}`);
@@ -881,6 +1075,33 @@ const tonConnectBridge = {
         tonConnect.sendTonTransaction(nanoInTon,
             recipientAddress, "CLEAR", callback);
     },
+
+    GetPlayerScore: function(playerAddress, callback)
+    {
+        console.log(`[Uniton Connect] Get player score called`);
+        tonConnect.GetPlayerTotalScore(playerAddress, callback);
+    },
+    // GetPlayerScore: function(playerAddress, callback)
+    // {
+    //     console.log('[Uniton Connect] GetPlayerScore wrapper called');
+    //     try {
+    //         const playerAddressStr = UTF8ToString(playerAddress);
+    //         console.log('[Uniton Connect] Player address:', playerAddressStr);
+
+    //         // Convert score to string pointer for Unity's string callback
+    //         tonConnect.GetPlayerTotalScore(playerAddress, function(score) {
+    //             const scoreStr = score.toString();
+    //             const scorePtr = tonConnect.allocString(scoreStr);
+    //             {{{ makeDynCall('vi', 'callback') }}}(scorePtr);
+    //             _free(scorePtr);
+    //         });
+    //     } catch (err) {
+    //         console.error('[Uniton Connect] Error in GetPlayerScore:', err);
+    //         const errorPtr = tonConnect.allocString("0");
+    //         {{{ makeDynCall('vi', 'callback') }}}(errorPtr);
+    //         _free(errorPtr); 
+    //     }
+    // },
 
     SendTonTransactionWithMessage: function(nanoInTon,
         recipientAddress, message, callback)

@@ -198,6 +198,8 @@ namespace UnitonConnect.Core
         {
             if (!IsSupporedPlatform())
             {
+                UnitonConnectLogger.LogWarning("Not supported platform, try again later");
+
                 return;
             }
 
@@ -306,6 +308,30 @@ namespace UnitonConnect.Core
             TonConnectBridge.SendTon(recipientAddress, amount,
                 message, OnSendingTonFinish, OnSendingTonFail);
         }
+
+        public void GetPlayerTotalScore(string playerAddress, Action<string> callback)
+        {
+            if (!IsSupporedPlatform())
+            {
+                return;
+            }
+
+            if (!_isInitialized)
+            {
+                UnitonConnectLogger.LogWarning("Sdk is not initialized, try again later");
+
+                return;
+            }
+
+            if (!_isWalletConnected)
+            {
+                UnitonConnectLogger.LogWarning("Wallet is not connected, do so and try again later");
+
+                return;
+            }
+
+            TonConnectBridge.GetPlayerTotalScore(playerAddress, callback);
+        }    
 
         /// <summary>
         /// Signs a message on the connected wallet to verify that it is actually connected to the dApp.
@@ -453,6 +479,7 @@ namespace UnitonConnect.Core
 
         private void OnConnect(WalletConfig walletConfig)
         {
+            Debug.Log($"Wallet Config: {walletConfig}");
             _isWalletConnected = true;
 
             _connectedWalletConfig = walletConfig;
@@ -464,7 +491,47 @@ namespace UnitonConnect.Core
 
             Wallet = new UserWallet(nonBouceableAddress, walletConfig);
 
-            OnWalletConnected?.Invoke(walletConfig);
+            Debug.Log($"Created Wallet: {Wallet}");
+            //Debug.Log($"Wallet.Address: {Wallet.ToShort(5)}");
+            Debug.Log("Wallet.Address: " + walletConfig.Address);
+            Debug.Log($"nonBouceableAddress: {nonBouceableAddress}");
+
+            //OnWalletConnected?.Invoke(walletConfig);
+            /*try
+            {
+                OnWalletConnected?.Invoke(walletConfig);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"error at other method when get event OnWalletConnected: {e.Message}\n{e.StackTrace}");
+            }*/
+
+            if (OnWalletConnected != null)
+            {
+                var delegates = OnWalletConnected.GetInvocationList();
+
+                Debug.Log($"OnWalletConnected has {delegates.Length} subscribers");
+
+                foreach (var del in delegates)
+                {
+                    try
+                    {
+                        Debug.Log($"Invoking subscriber: {del.Method.Name} in {del.Target?.GetType().Name ?? "NULL TARGET"}");
+
+                        del.DynamicInvoke(walletConfig);
+
+                        Debug.Log($"Successfully invoked: {del.Method.Name}");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogError($"   ERROR in {del.Method.Name}: {ex.Message}");
+                        Debug.LogError($"   Target: {del.Target?.GetType().Name ?? "NULL"}");
+                        Debug.LogError($"   Stack: {ex.StackTrace}");
+                    }
+                }
+            }
+
+            Debug.Log("=== SDK OnConnect DONE ===");
         }
 
         private void OnConnectFail(string errorMessage)

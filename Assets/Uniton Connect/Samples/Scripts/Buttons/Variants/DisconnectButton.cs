@@ -1,0 +1,19 @@
+using UnityEngine;
+
+namespace UnitonConnect.Core.Demo
+{
+    public sealed class DisconnectButton : TestBaseButton
+    {
+        [SerializeField, Space] private WalletInterfaceAdapter _interfaceAdapter;
+
+        public sealed override void OnClick()
+        {
+            Debug.Log("The disconnecting process of the previously connected wallet has been started");
+
+            _interfaceAdapter.UnitonSDK.Disconnect();
+
+            Debug.Log("Success disconnect");
+
+        }
+    }
+}
