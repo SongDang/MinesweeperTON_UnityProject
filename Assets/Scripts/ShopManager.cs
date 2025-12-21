@@ -32,4 +32,13 @@ public class ShopManager : MonoBehaviour
     {
         Debug.Log($"Buy: {item.itemName} with {item.price} TON");
     }
+
+    public void OpenShop()
+    {
+        gameObject.SetActive(true);
+    }
+    public void CloseShop()
+    {
+        gameObject.SetActive(false);
+    }
 }
