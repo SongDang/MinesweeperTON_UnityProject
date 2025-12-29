@@ -89,6 +89,11 @@ namespace UnitonConnect.Core
             string message, Action<string> onTransactionSended);
 
         [DllImport("__Internal")]
+        private static extern void SendTonSmartContractTx(
+            string nanoTonPtr, string methodPtr,
+            string jsonParamsPtr, Action<string> onTransactionSended);
+
+        [DllImport("__Internal")]
         private static extern void SendTransactionWithPayload(
             string jettonMassterOrNftAddress, string gasFee,
             string payload, Action<string> transactionSended);
@@ -555,6 +560,13 @@ namespace UnitonConnect.Core
                 message, transactionSended, transactionSendFailed);
         }
 
+        internal static void SendTx(decimal tonAmount, string methodPtr, 
+            string jsonParamsPtr, Action<string> transactionSended, Action<string> transactionSendFailed)
+        {
+            SendTonSmartContract(tonAmount,methodPtr,
+                jsonParamsPtr, transactionSended, transactionSendFailed);
+        }
+
         internal static void GetPlayerTotalScore(string playerAddress, Action<string> callback)
         {
             UnitonConnectLogger.Log("TonConnectBridge GetPlayerTotalScore");
@@ -725,6 +737,20 @@ namespace UnitonConnect.Core
             });
             /*SendTonTransactionWithMessage(tonInNanotons, 
                 targetAddress, message, OnTonTransactionSend);*/
+        }
+
+        private static void SendTonSmartContract(decimal tonAmount, 
+            string methodPtr, string jsonParamsPtr, 
+            Action<string> transactionSended, Action<string> transactionSendFailed)
+        {
+            OnTonTransactionSended = transactionSended;
+            OnTonTransactionSendFailed = transactionSendFailed;
+
+            SubscribeToTransactionEvents(OnTransactionSuccessfullySign, OnTransactionSignFail);
+
+            var nanoTonPtr = UserAssetsUtils.ToNanoton(tonAmount).ToString();
+
+            SendTonSmartContractTx(nanoTonPtr, methodPtr, jsonParamsPtr, OnTonTransactionSend);
         }
 
         private static void SendJettonByParams(string senderJettonWalletContract, string gasFee,

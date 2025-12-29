@@ -309,6 +309,36 @@ namespace UnitonConnect.Core
                 message, OnSendingTonFinish, OnSendingTonFail);
         }
 
+        public void SendSmartContractTransaction(string methodPtr, string jsonParamsPtr)
+        {
+            decimal amount = 0.1m; //amount = gasfee
+
+            if (!IsSupporedPlatform())
+            {
+                return;
+            }
+
+            if (!_isInitialized)
+            {
+                UnitonConnectLogger.LogWarning("Sdk is not initialized, try again later");
+
+                return;
+            }
+
+            if (!_isWalletConnected)
+            {
+                UnitonConnectLogger.LogWarning("Wallet is not connected, do so and try again later");
+
+                return;
+            }
+
+            UnitonConnectLogger.Log($"Created a request to send a Transaction" +
+                $" to the SmartContract in amount {amount}");
+
+            TonConnectBridge.SendTx(amount, methodPtr, 
+                jsonParamsPtr, OnSendingTonFinish, OnSendingTonFail);
+        }
+
         public void GetPlayerTotalScore(string playerAddress, Action<string> callback)
         {
             if (!IsSupporedPlatform())
