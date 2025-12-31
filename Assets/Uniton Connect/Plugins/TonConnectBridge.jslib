@@ -4,7 +4,7 @@ const tonConnectBridge = {
     // Class definition
 
     $tonConnect: {
-        CONTRACT_ADDRESS: "EQBqedp39NWpTSPz1WeFTUP4JrGJDLZxQiA9MbNXzqTPm4oR",
+        CONTRACT_ADDRESS: "EQBvmbTwzrUSlEuksZNFbhZBoJ_4EN67r6hW9O5j1EfuVeDU",
 
         allocString: function (stringData)
         {
@@ -699,8 +699,7 @@ const tonConnectBridge = {
                         break;
 
                     case "claim_reward":
-                        cell.bits.writeUint(0xEB591FCF, 32); 
-                        cell.bits.writeUint(0, 64);
+                        cell.bits.writeUint(0x27BB9A66 , 32); 
                         cell.bits.writeCoins(BigInt(params.amountReward))
                         break;
 
