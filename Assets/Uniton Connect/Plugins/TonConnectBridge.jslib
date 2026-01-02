@@ -4,7 +4,7 @@ const tonConnectBridge = {
     // Class definition
 
     $tonConnect: {
-        CONTRACT_ADDRESS: "EQBvmbTwzrUSlEuksZNFbhZBoJ_4EN67r6hW9O5j1EfuVeDU",
+        CONTRACT_ADDRESS: "EQAYMDNKaN7JaCD6YDNGWxV_Kz38lrJXFjjRUI3_-Yotew7P",
 
         allocString: function (stringData)
         {
