@@ -99,6 +99,12 @@ namespace UnitonConnect.Core
             string payload, Action<string> transactionSended);
 
         [DllImport("__Internal")]
+        private static extern void GetPlayerStat(
+            string methodName,
+            string playerAddress,
+            Action<string> callback);
+
+        [DllImport("__Internal")]
         private static extern void GetPlayerScore(
             string playerAddress, 
             Action<string> callback);
@@ -313,6 +319,14 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPlayerStatCallback(string itemCount)
+        {
+            UnitonConnectLogger.Log($"Player item received: {itemCount}");
+            OnPlayerStatReceived?.Invoke(itemCount);
+            OnPlayerStatReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnPlayerScoreCallback(string score)
         {
             UnitonConnectLogger.Log($"Player score received: {score}");
@@ -477,6 +491,7 @@ namespace UnitonConnect.Core
         private static Action<string> OnTonTransactionSendFailed;
 
         private static Action<string> OnPlayerScoreReceived;
+        private static Action<string> OnPlayerStatReceived;
 
         private static Action<string> OnJettonTransactionSended;
         private static Action<string> OnJettonTransactionSendFailed;
@@ -565,6 +580,16 @@ namespace UnitonConnect.Core
         {
             SendTonSmartContract(tonAmount,methodPtr,
                 jsonParamsPtr, transactionSended, transactionSendFailed);
+        }
+
+        internal static void GetPlayerItemCount(string methodName, string playerAddress, Action<string> callback)
+        {
+            UnitonConnectLogger.Log("TonConnectBridge GetPlayerStat");
+            OnPlayerStatReceived = callback;
+
+            Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
+                GetPlayerStat(methodName, bounceableAddress, OnPlayerStatCallback);
+            });
         }
 
         internal static void GetPlayerTotalScore(string playerAddress, Action<string> callback)

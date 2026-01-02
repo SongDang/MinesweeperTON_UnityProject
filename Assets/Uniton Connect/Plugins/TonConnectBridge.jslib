@@ -692,23 +692,30 @@ const tonConnectBridge = {
                 const cell = new tonWeb.boc.Cell();
             
                 switch (method) {
-                    case "set_score":
-                        cell.bits.writeUint(0x4a25ce37, 32); 
-                        cell.bits.writeUint(0, 64);          // QueryID 
-                        cell.bits.writeUint(params.score, 64); 
-                        break;
-
                     case "claim_reward":
-                        cell.bits.writeUint(0x27BB9A66 , 32); 
+                        cell.bits.writeUint(0x27BB9A66, 32); 
                         cell.bits.writeCoins(BigInt(params.amountReward))
                         break;
 
-                    // case "buy_item":
-                    //     cell.bits.writeUint(0x99aabbcc, 32);
-                    //     cell.bits.writeUint(0, 64);
-                    //     cell.bits.writeUint(params.item_id, 32);
-                    //     cell.bits.writeUint(params.quantity, 32);
-                    //     break;
+                    case "buy_heart":
+                        cell.bits.writeUint(0xC63CDE42, 32);
+                        cell.bits.writeUint(params.quantity, 32);
+                        break;
+                    
+                    case "buy_laser":
+                        cell.bits.writeUint(0xC3B889DA, 32);
+                        cell.bits.writeUint(params.quantity, 32);
+                        break;
+                    
+                    case "use_heart":
+                        cell.bits.writeUint(0xD5E8C916, 32);
+                        cell.bits.writeUint(params.quantity, 32);
+                        break;
+                    
+                    case "use_laser":
+                        cell.bits.writeUint(0x86821106, 32);
+                        cell.bits.writeUint(params.quantity, 32);
+                        break;
 
                     default:
                         console.error("Unknown method: " + method);
@@ -849,7 +856,7 @@ const tonConnectBridge = {
 
             
 
-            // Create address cell - EXACTLY like the console test
+            // Create address cell
             var addressObj = new tonWeb.utils.Address(playerAddress);
             var cell = new tonWeb.boc.Cell();
             cell.bits.writeAddress(addressObj);
@@ -899,6 +906,85 @@ const tonConnectBridge = {
                 var strPtr = tonConnect.allocString(scoreStr);
 
                 console.log('[Uniton Connect] Returning to Unity:', scoreStr);
+                {{{ makeDynCall('vi', 'callback') }}}(strPtr);
+                _free(strPtr);
+            })
+            .catch(function(error) {
+                console.error('[Uniton Connect] Error:', error);
+                var errPtr = tonConnect.allocString('0');
+                {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+                _free(errPtr);
+            });
+        },
+
+        GetPlayerItemCount: function (methodNamePtr, playerAddressPtr, callback) 
+        {
+            console.log('[Uniton Connect] GetPlayerItemCount called');
+    
+            var methodName = UTF8ToString(methodNamePtr);
+            var playerAddress = UTF8ToString(playerAddressPtr);
+            var tonWeb = window.tonWeb;
+
+            if (!tonWeb) 
+            {
+                console.error('[Uniton Connect] TonWeb not initialized!');
+                 errPtr = tonConnect.allocString('0');
+                {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+                _free(errPtr);
+                return;
+            }
+            console.log('[Uniton Connect] Calling get_info for:', playerAddress);
+
+            // Create address cell
+            var addressObj = new tonWeb.utils.Address(playerAddress);
+            var cell = new tonWeb.boc.Cell();
+            cell.bits.writeAddress(addressObj);
+    
+            cell.toBoc(false).then(function(bocBytes) {
+                var bocBase64 = tonWeb.utils.bytesToBase64(bocBytes);
+                console.log('[Uniton Connect] Address BOC:', bocBase64);
+        
+                var apiUrl = 'https://testnet.toncenter.com/api/v2/runGetMethod';
+                var requestBody = JSON.stringify({
+                    address: tonConnect.CONTRACT_ADDRESS,
+                    method: methodName,
+                    stack: [["tvm.Slice", bocBase64]]
+                });
+
+                console.log('[Uniton Connect] Request:', requestBody);
+
+                return fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: requestBody
+                });
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('[Uniton Connect] API Response:', data);
+                console.log('[Uniton Connect] Exit code:', data.result ? data.result.exit_code : 'N/A');
+        
+                var item = 0;
+                if (data.ok && data.result && data.result.exit_code === 0) {
+                if (data.result.stack && data.result.stack.length > 0) {
+                        var stackItem = data.result.stack[0];
+                        console.log('[Uniton Connect] Stack item:', stackItem);
+                
+                        if (stackItem[0] === 'num') {
+                            item = parseInt(stackItem[1], 16);
+                            console.log('[Uniton Connect] Item (decimal):', item);
+                        }
+                }
+                } else {
+                    console.warn('[Uniton Connect] Failed - exit code:', data.result ? data.result.exit_code : 'N/A');
+                }
+        
+                var itemStr = item.toString();
+                var strPtr = tonConnect.allocString(itemStr);
+
+                console.log('[Uniton Connect] Returning to Unity:', itemStr);
                 {{{ makeDynCall('vi', 'callback') }}}(strPtr);
                 _free(strPtr);
             })
@@ -1098,6 +1184,12 @@ const tonConnectBridge = {
     {
         console.log(`[Uniton Connect] Get player score called`);
         tonConnect.GetPlayerTotalScore(playerAddress, callback);
+    },
+
+    GetPlayerStat: function(methodName, playerAddress, callback)
+    {
+        console.log(`[Uniton Connect] Get player stat called`);
+        tonConnect.GetPlayerItemCount(methodName, playerAddress, callback);
     },
 
     SendTonTransactionWithMessage: function(nanoInTon,

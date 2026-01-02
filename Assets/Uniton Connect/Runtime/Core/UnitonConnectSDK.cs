@@ -339,6 +339,30 @@ namespace UnitonConnect.Core
                 jsonParamsPtr, OnSendingTonFinish, OnSendingTonFail);
         }
 
+        public void GetPlayerStat(string methodName, string playerAddress, Action<string> callback)
+        {
+            if (!IsSupporedPlatform())
+            {
+                return;
+            }
+
+            if (!_isInitialized)
+            {
+                UnitonConnectLogger.LogWarning("Sdk is not initialized, try again later");
+
+                return;
+            }
+
+            if (!_isWalletConnected)
+            {
+                UnitonConnectLogger.LogWarning("Wallet is not connected, do so and try again later");
+
+                return;
+            }
+
+            TonConnectBridge.GetPlayerItemCount(methodName, playerAddress, callback);
+        }
+
         public void GetPlayerTotalScore(string playerAddress, Action<string> callback)
         {
             if (!IsSupporedPlatform())
