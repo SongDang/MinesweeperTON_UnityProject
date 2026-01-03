@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 022b96193b478434e8744df56d2b15ad, type: 3}
-  m_Name: Heart
+  m_Name: Laser
   m_EditorClassIdentifier: 
-  icon: {fileID: 21300000, guid: ca8b22af3d3daad45a4183c666256ae0, type: 3}
-  id: 0
-  itemName: heart
-  price: 1.5
-  info: Use this to play a level. You'll get a free one every 24 hours!
+  icon: {fileID: 21300000, guid: df3c4a5241a54a540be52f79987a0a1d, type: 3}
+  id: 1
+  itemName: laser
+  price: 0.5
+  info: 'Destroys a random non-bomb stone. '
