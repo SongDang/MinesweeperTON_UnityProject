@@ -7,7 +7,7 @@ public class PlayerStatsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI heartText;
     [SerializeField] private TextMeshProUGUI laserText;
 
-    private void OnEnable()
+    private void Start()
     {
         if (PlayerStatsManager.Instance != null)
         {
@@ -17,6 +17,10 @@ public class PlayerStatsUI : MonoBehaviour
             UpdateHeartDisplay(PlayerStatsManager.Instance.heart);
             UpdateLaserDisplay(PlayerStatsManager.Instance.laser);
         }
+        else
+        {
+            Debug.Log("PlayerStatsManager null");
+        }    
     }
 
     private void OnDisable()
@@ -30,10 +34,24 @@ public class PlayerStatsUI : MonoBehaviour
 
     private void UpdateHeartDisplay(string heart)
     {
-        if (heartText != null) heartText.text = heart;
+        if (heart == null)
+        {
+            Debug.Log("heart null");
+            return;
+        }    
+        
+        heartText.text = heart;
+        Debug.Log("update heart: " + heart);
     }
     private void UpdateLaserDisplay(string laser)
     {
-        if (laserText != null) laserText.text = laser;
+        if (laser == null)
+        {
+            Debug.Log("laser null");
+            return;
+        } 
+
+        laserText.text = laser;
+        Debug.Log("update laser: " + laser);
     }
 }

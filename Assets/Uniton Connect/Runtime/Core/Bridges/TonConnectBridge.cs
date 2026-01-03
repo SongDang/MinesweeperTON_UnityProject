@@ -319,11 +319,19 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
-        private static void OnPlayerStatCallback(string itemCount)
+        private static void OnPlayerHeartCallback(string itemCount)
         {
-            UnitonConnectLogger.Log($"Player item received: {itemCount}");
-            OnPlayerStatReceived?.Invoke(itemCount);
-            OnPlayerStatReceived = null; // Clear after use
+            UnitonConnectLogger.Log($"Player heart received: {itemCount}");
+            OnPlayerHeartReceived?.Invoke(itemCount);
+            OnPlayerHeartReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPlayerLaserCallback(string itemCount)
+        {
+            UnitonConnectLogger.Log($"Player laser received: {itemCount}");
+            OnPlayerLaserReceived?.Invoke(itemCount);
+            OnPlayerLaserReceived = null; // Clear after use
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
@@ -491,7 +499,8 @@ namespace UnitonConnect.Core
         private static Action<string> OnTonTransactionSendFailed;
 
         private static Action<string> OnPlayerScoreReceived;
-        private static Action<string> OnPlayerStatReceived;
+        private static Action<string> OnPlayerHeartReceived;
+        private static Action<string> OnPlayerLaserReceived;
 
         private static Action<string> OnJettonTransactionSended;
         private static Action<string> OnJettonTransactionSendFailed;
@@ -585,11 +594,24 @@ namespace UnitonConnect.Core
         internal static void GetPlayerItemCount(string methodName, string playerAddress, Action<string> callback)
         {
             UnitonConnectLogger.Log("TonConnectBridge GetPlayerStat");
-            OnPlayerStatReceived = callback;
 
-            Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
-                GetPlayerStat(methodName, bounceableAddress, OnPlayerStatCallback);
-            });
+            if(methodName== "get_heart")
+            {
+                OnPlayerHeartReceived = callback;
+
+                Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
+                    GetPlayerStat(methodName, bounceableAddress, OnPlayerHeartCallback);
+                });
+            }
+            else
+            {
+                OnPlayerLaserReceived = callback;
+
+                Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
+                    GetPlayerStat(methodName, bounceableAddress, OnPlayerLaserCallback);
+                });
+            }
+                    
         }
 
         internal static void GetPlayerTotalScore(string playerAddress, Action<string> callback)

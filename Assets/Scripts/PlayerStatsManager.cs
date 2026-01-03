@@ -56,6 +56,7 @@ public class PlayerStatsManager : MonoBehaviour
         UnitonConnectSDK.Instance.GetPlayerStat(GetHeartMethod, playerAddress, (result) =>
         {
             Debug.Log($"Heart updated: {result}");
+
             heart = result;
             OnHeartUpdated?.Invoke(heart);
         });

@@ -4,7 +4,7 @@ const tonConnectBridge = {
     // Class definition
 
     $tonConnect: {
-        CONTRACT_ADDRESS: "EQAYMDNKaN7JaCD6YDNGWxV_Kz38lrJXFjjRUI3_-Yotew7P",
+        CONTRACT_ADDRESS: "kQDl9lNjdiLh2JMZGukU0Y1ADGxo3JMD-FdFNW8CxQt_WgGH",
 
         allocString: function (stringData)
         {
@@ -935,6 +935,47 @@ const tonConnectBridge = {
             }
             console.log('[Uniton Connect] Calling get_info for:', playerAddress);
 
+            var retryWithBackoff = function(fn, maxRetries, baseDelay) {
+                var attempt = 0;
+        
+                var tryRequest = function() {
+                    attempt++;
+                    console.log('[Uniton Connect] Attempt ' + attempt + '/' + maxRetries);
+            
+                    return fn().catch(function(error) {
+                        if (attempt >= maxRetries) {
+                            console.error('[Uniton Connect] All ' + maxRetries + ' attempts failed');
+                            throw error;
+                        }
+                
+                        // Exponential backoff: 1s, 2s, 4s
+                        var delay = baseDelay * Math.pow(2, attempt - 1);
+                        console.log('[Uniton Connect] Request failed, retrying in ' + delay + 'ms...');
+                        console.log('[Uniton Connect] Error was:', error.message || error);
+                
+                        return new Promise(function(resolve) {
+                            setTimeout(function() {
+                                resolve(tryRequest());
+                            }, delay);
+                        });
+                    });
+                };
+        
+                return tryRequest();
+            };
+
+            //add time out for fetch
+            var fetchWithTimeout = function(url, options, timeout) {
+                return Promise.race([
+                    fetch(url, options),
+                    new Promise(function(_, reject) {
+                        setTimeout(function() {
+                            reject(new Error('Request timeout after ' + timeout + 'ms'));
+                        }, timeout);
+                    })
+                ]);
+            };
+
             // Create address cell
             var addressObj = new tonWeb.utils.Address(playerAddress);
             var cell = new tonWeb.boc.Cell();
@@ -953,15 +994,33 @@ const tonConnectBridge = {
 
                 console.log('[Uniton Connect] Request:', requestBody);
 
-                return fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: requestBody
-                });
+                // return fetch(apiUrl, {
+                //     method: 'POST',
+                //     headers: {'Content-Type': 'application/json'},
+                //     body: requestBody
+                // });
+
+                var makeRequest = function() {
+                    return fetchWithTimeout(apiUrl, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: requestBody
+                    }, 10000) // 10 second timeout
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('HTTP error! status: ' + response.status);
+                        }
+                        return response.json();
+                    });
+                };
+        
+                // retry with 3 attempts, delay start with 1000ms
+                return retryWithBackoff(makeRequest, 3, 1000); //makeRequest again
+
             })
-            .then(function(response) {
-                return response.json();
-            })
+            // .then(function(response) {
+            //     return response.json();
+            // })
             .then(function(data) {
                 console.log('[Uniton Connect] API Response:', data);
                 console.log('[Uniton Connect] Exit code:', data.result ? data.result.exit_code : 'N/A');
