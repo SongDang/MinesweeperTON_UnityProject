@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 
 
 public class Game : MonoBehaviour
@@ -67,6 +69,7 @@ public class Game : MonoBehaviour
 
     public GameObject gameoverscreen;
     public GameObject gamewinscreen;
+    public GameObject rewardPopup;
 
     public UserDatas _userDatas;
     public const string DATA_KEY = "DATA_KEY";
@@ -81,6 +84,11 @@ public class Game : MonoBehaviour
 
     public GameObject bugPrefab;
 
+    private int goldCount = 0;
+    private int diamondCount = 0;
+    private int floodingCount;
+    private bool isFlooding = false;
+
     private void OnValidate()
     {
         mineCount = Mathf.Clamp(mineCount, 0, width * height);
@@ -89,14 +97,9 @@ public class Game : MonoBehaviour
 
     public void Start()
     {
-        
-
-        this.textgold.text = _userDatas.gold.ToString();
-        this.textdiamond.text = _userDatas.diamond.ToString();
-        this.textlevel.text = _userDatas.level.ToString();
-
+        this.textgold.text = goldCount.ToString();
+        this.textdiamond.text = diamondCount.ToString();
         NewGame();
-
     }
 
     public void NewGame()
@@ -154,7 +157,6 @@ public class Game : MonoBehaviour
     
     private void Update()
     {
-        
         if (!gameover)
         {
             Sweep();
@@ -167,6 +169,9 @@ public class Game : MonoBehaviour
 
     public void RevealAndFlag()
     {
+        if (isFlooding) return;
+        if (rewardPopup.activeSelf) return;
+
         if(EventSystem.current.currentSelectedGameObject == null && Bagscreen.activeSelf == false)
         {
             
@@ -225,8 +230,8 @@ public class Game : MonoBehaviour
         
     public void AdjustText() 
     {
-        textgold.text = _userDatas.gold.ToString();
-        textdiamond.text = _userDatas.diamond.ToString();
+        textgold.text = goldCount.ToString();
+        textdiamond.text = diamondCount.ToString();
         //textheart.text = heart.ToString();
         textlevel.text = _userDatas.level.ToString();
     }
@@ -246,7 +251,7 @@ public class Game : MonoBehaviour
         }
         
     }
-
+    
     public void Reveal(Cell cell)
     {
         
@@ -289,6 +294,9 @@ public class Game : MonoBehaviour
         if (cell.revealed) yield break;
         if (cell.type == Cell.Type.Mine) yield break;
         if (cell.type == Cell.Type.Block) yield break;
+
+        floodingCount++;
+        isFlooding = true;
 
         cell.revealed = true;
         Vector3 centerCellPosition = new Vector3(cell.position.x + 0.5f, cell.position.y + 0.5f, cell.position.z);
@@ -336,7 +344,19 @@ public class Game : MonoBehaviour
                 StartCoroutine(Flood(bottomRight));
             }*/
         }
-        
+
+        floodingCount--;
+        if (floodingCount <= 0)
+        {
+            floodingCount = 0;
+            Invoke("CheckAfterFlooding", 0.5f);
+        }
+    }
+
+    public void CheckAfterFlooding()
+    {
+        isFlooding = false;
+        CheckReward();
     }
 
     private void Flag()
@@ -499,14 +519,14 @@ public class Game : MonoBehaviour
         for(int i = 0; i < bonusgold; i++)
         {
             InstantiateAndMove(goldPrefab, cell.position);
-            _userDatas.gold += 1;
+            goldCount += 1;
 
             AudioManager.Instance.OreSound();
         }
         for (int i = 0; i < bonusdiamond; i++)
         {
             InstantiateAndMove(diamondPrefab, cell.position);
-            _userDatas.diamond += 1;
+            diamondCount += 1;
 
             AudioManager.Instance.RareOreSound();
         }
@@ -514,6 +534,37 @@ public class Game : MonoBehaviour
         if(Random.value > 0.98)        //ti le spawn bug
             SpawnBug(cell);
         SaveData();
+    }
+
+    public void CheckReward()
+    {
+        if (rewardPopup.activeSelf) return;
+
+        if (goldCount > 0 || diamondCount > 0)
+        {
+            AdjustText();
+            rewardPopup.SetActive(true);
+        }
+    }
+
+    public void GetReward()
+    {
+        goldCount = 0;
+        diamondCount = 0;
+
+        holdTime = 0f;
+
+        rewardPopup.SetActive(false);
+    }
+
+    public void DropReward()
+    {
+        goldCount = 0;
+        diamondCount = 0;
+
+        holdTime = 0f;
+
+        rewardPopup.SetActive(false);
     }
 
     private IEnumerator MoveAndHandleObject(GameObject obj)
