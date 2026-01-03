@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnitonConnect.Core;
+using TMPro;
 
 public class Menu : MonoBehaviour
 {
     public AudioSource _audiosourceBG;
     public AudioClip bgmenu;
+    public TextMeshProUGUI addressText;
+
     void Start()
     {
         _audiosourceBG.clip = bgmenu;
@@ -29,11 +32,12 @@ public class Menu : MonoBehaviour
     {
         if(UnitonConnectSDK.Instance.IsWalletConnected)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GamePlay");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Home");
         }
         else
         {
             Debug.Log("Connect your wallet to start playing");
+            addressText.text = "Connect your wallet to start playing!";
         }
     }
 

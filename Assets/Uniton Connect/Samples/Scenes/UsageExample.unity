@@ -3472,6 +3472,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CanvasUIMenu
       objectReference: {fileID: 0}
+    - target: {fileID: 868924186653636100, guid: d10bcce5d2d4497458c5c7ec98b8e854, type: 3}
+      propertyPath: addressText
+      value: 
+      objectReference: {fileID: 2058162193}
     - target: {fileID: 1044069037938855491, guid: d10bcce5d2d4497458c5c7ec98b8e854, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -47.074005
