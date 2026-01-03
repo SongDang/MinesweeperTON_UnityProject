@@ -18,8 +18,15 @@ public class PlayerStatsManager : MonoBehaviour
 
     private void Start()
     {
-        if (UnitonConnectSDK.Instance == null) return;
-        UnitonConnectSDK.Instance.OnWalletConnected += FetchPlayerStats;
+        if (UnitonConnectSDK.Instance == null)
+        {
+            Debug.Log("UnitonConnectSDK null");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+            return;
+        }
+
+        FetchHeartCount();
+        FetchLaserCount();
     }
 
     private void Awake()

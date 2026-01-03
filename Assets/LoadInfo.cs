@@ -40,7 +40,7 @@ public class LoadInfo : MonoBehaviour
     public void UpdateBalance(decimal tonBalance)
     {
         UnitonConnectLogger.Log("Update Player Balance");
-        balanceText.text = $"Balance: {Math.Round(tonBalance, 4)} TON";
+        balanceText.text = $"{Math.Round(tonBalance, 4)}";
     }
     public void WalletConnected(WalletConfig wallet)
     {
