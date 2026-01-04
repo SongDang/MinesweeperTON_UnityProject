@@ -721,6 +721,10 @@ const tonConnectBridge = {
                         cell.bits.writeUint(0x7AE5EF0, 32);
                         cell.bits.writeUint(params.upgradeType, 32);
                         break;
+                    
+                    case "heart_reward":
+                        cell.bits.writeUint(0x5B56DDC9, 32);
+                        break;
 
                     default:
                         console.error("Unknown method: " + method);
