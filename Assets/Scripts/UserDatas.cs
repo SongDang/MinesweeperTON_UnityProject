@@ -27,11 +27,11 @@ public class UserDatas
 
     public void Init()
     {
-        level = 5;
-        gold = 9999;
-        diamond = 9999;
-        maxheart = 3;
-        heart = 3;
+        level = 3;
+        gold = 0;
+        diamond = 0;
+        maxheart = 2;
+        heart = 2;
         timedig = 1.5f;
         probalitygold = 15;
         probalitydiamond = 4;

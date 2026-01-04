@@ -233,7 +233,7 @@ public class Game : MonoBehaviour
         textgold.text = goldCount.ToString();
         textdiamond.text = diamondCount.ToString();
         //textheart.text = heart.ToString();
-        textlevel.text = _userDatas.level.ToString();
+        //textlevel.text = _userDatas.level.ToString();
     }
         
     private void Reveal()
@@ -531,8 +531,8 @@ public class Game : MonoBehaviour
             AudioManager.Instance.RareOreSound();
         }
 
-        if(Random.value > 0.98)        //ti le spawn bug
-            SpawnBug(cell);
+        //if(Random.value > 0.98)        //ti le spawn bug
+            //SpawnBug(cell);
         SaveData();
     }
 
