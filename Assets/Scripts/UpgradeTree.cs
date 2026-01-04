@@ -74,29 +74,35 @@ public class UpgradeTree : MonoBehaviour
 
         UpdateInfoText();
         btnConfirm.interactable = true;
+
+        UnitonConnectLogger.Log($"Upgrade tree, on select upgrade, type: {selectedType}, level:{selectedLevelTarget}, currentCost:{currentCost}");
     }
     private void SetupButtonListeners()
     {
+        UnitonConnectLogger.Log("Upgrade tree set up button listeners");
+
         for (int i = 0; i < btnDigs.Length; i++)
         {
             int index = i;
-            btnDigs[i].onClick.AddListener(() => OnSelectButton(btnDigs[index], 0, index));
+            btnDigs[i].onClick.AddListener(() => OnSelectButton(btnDigs[index], 0, index+1));
         }
 
         for (int i = 0; i < btnHearts.Length; i++)
         {
             int index = i;
-            btnHearts[i].onClick.AddListener(() => OnSelectButton(btnHearts[index], 1, index));
+            btnHearts[i].onClick.AddListener(() => OnSelectButton(btnHearts[index], 1, index+1));
         }
 
         for (int i = 0; i < btnOres.Length; i++)
         {
             int index = i;
-            btnOres[i].onClick.AddListener(() => OnSelectButton(btnOres[index], 2, index));
+            btnOres[i].onClick.AddListener(() => OnSelectButton(btnOres[index], 2, index+1));
         }
     }
     public void OnSelectButton(Button btnClicked, int typeInt, int targetLevelIndex)
     {
+        UnitonConnectLogger.Log($"Upgrade tree on select button, type:{typeInt}, level:{targetLevelIndex}");
+
         if (currentSelectedBtn != null && currentSelectedBtn != btnClicked)
         {
             if (currentSelectedBtn.image.color == selectedColor)
@@ -118,14 +124,14 @@ public class UpgradeTree : MonoBehaviour
         switch (selectedType)
         {
             case UpgradeType.DigSpeed:
-                if (selectedLevelTarget == 0) info = $"Dig Time: 2s -> 1.5s\nCost: {costStr}";
+                if (selectedLevelTarget == 1) info = $"Dig Time: 2s -> 1.5s\nCost: {costStr}";
                 else info = $"Dig Time: 1.5s -> 1s\nCost: {costStr}";
                 break;
             case UpgradeType.MaxHeart:
-                info = $"Max Hearts: {3 + selectedLevelTarget} -> {4 + selectedLevelTarget}\nCost: {costStr}";
+                info = $"Max Hearts: {2 + selectedLevelTarget} -> {3 + selectedLevelTarget}\nCost: {costStr}";
                 break;
             case UpgradeType.OreLuck:
-                if (selectedLevelTarget == 0) info = $"Gold Chance +10%\nCost: {costStr}";
+                if (selectedLevelTarget == 1) info = $"Gold Chance +10%\nCost: {costStr}";
                 else info = $"Gold Chance +5%, Diamond +3%\nCost: {costStr}";
                 break;
         }
@@ -165,8 +171,8 @@ public class UpgradeTree : MonoBehaviour
         {
             if (buttons[i] != null)
             {
-                bool canUpgrade = (currentLevel == (i + 1));
-                bool isUpgraded = (currentLevel > (i + 1));
+                bool canUpgrade = (currentLevel == i);
+                bool isUpgraded = (currentLevel > i);
 
                 buttons[i].interactable = canUpgrade;
 
@@ -213,7 +219,7 @@ public class UpgradeTree : MonoBehaviour
 
         if (UnitonConnectSDK.Instance.TonBalance < currentCost)
         {
-            textInfo.text = "Not enough TON!";
+            UnitonConnectLogger.Log($"Not enough TON");
             return;
         }
 

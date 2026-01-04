@@ -750,7 +750,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &122790468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4755,7 +4755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa88c17ecf1a7424a917017ff9e62bde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textBalance: {fileID: 2082865270}
+  textBalance: {fileID: 941148980}
   textInfo: {fileID: 1306110715}
   btnConfirm: {fileID: 1994843347}
   btnDigs:
@@ -5492,14 +5492,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 900863818}
-        m_TargetAssemblyTypeName: Upgrade, Assembly-CSharp
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
         m_MethodName: 
-        m_Mode: 3
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -9561,9 +9561,9 @@ RectTransform:
   m_Father: {fileID: 900863819}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -17, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1785609897
 MonoBehaviour:
@@ -11293,8 +11293,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Upgrade, Assembly-CSharp
+      - m_Target: {fileID: 900863824}
+        m_TargetAssemblyTypeName: UpgradeTree, Assembly-CSharp
         m_MethodName: ConfirmUpgrade
         m_Mode: 1
         m_Arguments:
@@ -11375,8 +11375,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1787912708}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.55478394}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}

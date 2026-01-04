@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using UnitonConnect.Core;
 using UnitonConnect.Core.Data;
+using System.Collections;
 
 public class PlayerStatsManager : MonoBehaviour
 {
@@ -35,11 +36,27 @@ public class PlayerStatsManager : MonoBehaviour
             return;
         }
 
+        FetchAllStats();
+    }
+
+    private void FetchAllStats()
+    {
+        StartCoroutine(FetchStatsRoutine());
+    }
+    private IEnumerator FetchStatsRoutine()
+    {
         FetchHeartCount();
+        yield return new WaitForSeconds(0.3f);
+
         FetchLaserCount();
+        yield return new WaitForSeconds(0.3f);
 
         FetchLevelDig();
+        yield return new WaitForSeconds(0.3f);
+
         FetchLevelHeart();
+        yield return new WaitForSeconds(0.3f);
+
         FetchLevelOre();
     }
 
@@ -95,7 +112,7 @@ public class PlayerStatsManager : MonoBehaviour
         string playerAddress = UnitonConnectSDK.Instance.Wallet.ToString();
         UnitonConnectSDK.Instance.GetPlayerStat(GetLevelDigMethod, playerAddress, (result) =>
         {
-            Debug.Log($"Level Laser updated: {result}");
+            Debug.Log($"Level Dig updated: {result}");
             int.TryParse(result, out int level);
             levelDig = level;
             OnLevelDigUpdated?.Invoke(levelDig);
