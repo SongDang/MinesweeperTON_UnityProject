@@ -54,14 +54,16 @@ public class ShopManager : MonoBehaviour
         if(item.itemName=="heart") //"itemName" not "name"
         {
             string jsonParams = "{\"qty\": 1}"; //1 item
-            sdk.SendSmartContractTransaction("buy_heart", jsonParams);
+            decimal itemPrice = item.price;
+            sdk.SendSmartContractTransaction("buy_heart", jsonParams, itemPrice);
 
             Debug.Log($"Buy: heart with {item.price} TON");
         }
         else
         {
             string jsonParams = "{\"qty\": 1}"; //1 item
-            sdk.SendSmartContractTransaction("buy_laser", jsonParams, 0.2m);
+            decimal itemPrice = item.price;
+            sdk.SendSmartContractTransaction("buy_laser", jsonParams, itemPrice);
 
             Debug.Log($"Buy: laser with {item.price} TON");
         }

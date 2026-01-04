@@ -311,7 +311,7 @@ namespace UnitonConnect.Core
 
         public void SendSmartContractTransaction(string methodPtr, string jsonParamsPtr, decimal cost = 0m)
         {
-            decimal amount = 0.1m + cost; //0.1m = gasfee
+            decimal amount = 0.05m + cost; //0.1m = gasfee
 
             if (!IsSupporedPlatform())
             {
@@ -361,6 +361,30 @@ namespace UnitonConnect.Core
             }
 
             TonConnectBridge.GetPlayerItemCount(methodName, playerAddress, callback);
+        }
+
+        public void GetGameData(string methodName, Action<string> callback)
+        {
+            if (!IsSupporedPlatform())
+            {
+                return;
+            }
+
+            if (!_isInitialized)
+            {
+                UnitonConnectLogger.LogWarning("Sdk is not initialized, try again later");
+
+                return;
+            }
+
+            if (!_isWalletConnected)
+            {
+                UnitonConnectLogger.LogWarning("Wallet is not connected, do so and try again later");
+
+                return;
+            }
+
+            TonConnectBridge.GetGameStat(methodName, callback);
         }
 
         public void GetPlayerTotalScore(string playerAddress, Action<string> callback)

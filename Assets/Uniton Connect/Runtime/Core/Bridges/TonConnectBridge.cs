@@ -105,6 +105,11 @@ namespace UnitonConnect.Core
             Action<string> callback);
 
         [DllImport("__Internal")]
+        private static extern void GetGameInfo(
+            string methodName,
+            Action<string> callback);
+
+        [DllImport("__Internal")]
         private static extern void GetPlayerScore(
             string playerAddress, 
             Action<string> callback);
@@ -327,6 +332,22 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPriceHeartCallback(string itemPrice)
+        {
+            UnitonConnectLogger.Log($"Price heart received: {itemPrice}");
+            OnPriceHeartReceived?.Invoke(itemPrice);
+            OnPriceHeartReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPriceLaserCallback(string itemPrice)
+        {
+            UnitonConnectLogger.Log($"Price laser received: {itemPrice}");
+            OnPriceLaserReceived?.Invoke(itemPrice);
+            OnPriceLaserReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnPlayerLaserCallback(string itemCount)
         {
             UnitonConnectLogger.Log($"Player laser received: {itemCount}");
@@ -502,6 +523,9 @@ namespace UnitonConnect.Core
         private static Action<string> OnPlayerHeartReceived;
         private static Action<string> OnPlayerLaserReceived;
 
+        private static Action<string> OnPriceHeartReceived;
+        private static Action<string> OnPriceLaserReceived;
+
         private static Action<string> OnJettonTransactionSended;
         private static Action<string> OnJettonTransactionSendFailed;
 
@@ -612,6 +636,25 @@ namespace UnitonConnect.Core
                 });
             }
                     
+        }
+
+        internal static void GetGameStat(string methodName, Action<string> callback)
+        {
+            UnitonConnectLogger.Log("TonConnectBridge GetGameStat");
+
+            if (methodName == "get_price_heart")
+            {
+                OnPriceHeartReceived = callback;
+
+                GetGameInfo(methodName, OnPriceHeartCallback);
+            }
+            else
+            {
+                OnPriceLaserReceived = callback;
+
+                GetGameInfo(methodName, OnPriceLaserCallback);
+            }
+
         }
 
         internal static void GetPlayerTotalScore(string playerAddress, Action<string> callback)

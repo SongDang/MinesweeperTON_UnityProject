@@ -4,7 +4,7 @@ const tonConnectBridge = {
     // Class definition
 
     $tonConnect: {
-        CONTRACT_ADDRESS: "kQDl9lNjdiLh2JMZGukU0Y1ADGxo3JMD-FdFNW8CxQt_WgGH",
+        CONTRACT_ADDRESS: "kQCRlx2PXaB6y6rdUB6NaLIwzHPeaEK2kJUCr5ilYGKosN05",
 
         allocString: function (stringData)
         {
@@ -1055,6 +1055,113 @@ const tonConnectBridge = {
             });
         },
 
+        GetGameData: function (methodNamePtr, callback) 
+        {
+            console.log('[Uniton Connect] GetGameData called');
+    
+            var methodName = UTF8ToString(methodNamePtr);
+            var tonWeb = window.tonWeb;
+
+            if (!tonWeb) 
+            {
+                console.error('[Uniton Connect] TonWeb not initialized!');
+                 errPtr = tonConnect.allocString('0');
+                {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+                _free(errPtr);
+                return;
+            }
+
+            var retryWithBackoff = function(fn, maxRetries, baseDelay) {
+                var attempt = 0;
+        
+                var tryRequest = function() {
+                    attempt++;
+                    console.log('[Uniton Connect] Attempt ' + attempt + '/' + maxRetries);
+            
+                    return fn().catch(function(error) {
+                        if (attempt >= maxRetries) {
+                            console.error('[Uniton Connect] All ' + maxRetries + ' attempts failed');
+                            throw error;
+                        }
+                
+                        // Exponential backoff: 1s, 2s, 4s
+                        var delay = baseDelay * Math.pow(2, attempt - 1);
+                        console.log('[Uniton Connect] Request failed, retrying in ' + delay + 'ms...');
+                        console.log('[Uniton Connect] Error was:', error.message || error);
+                
+                        return new Promise(function(resolve) {
+                            setTimeout(function() {
+                                resolve(tryRequest());
+                            }, delay);
+                        });
+                    });
+                };
+        
+                return tryRequest();
+            };
+
+            //add time out for fetch
+            var fetchWithTimeout = function(url, options, timeout) {
+                return Promise.race([
+                    fetch(url, options),
+                    new Promise(function(_, reject) {
+                        setTimeout(function() {
+                            reject(new Error('Request timeout after ' + timeout + 'ms'));
+                        }, timeout);
+                    })
+                ]);
+            };
+
+            var apiUrl = 'https://testnet.toncenter.com/api/v2/runGetMethod';
+        
+            var requestBody = JSON.stringify({
+                address: tonConnect.CONTRACT_ADDRESS,
+                method: methodName,
+                stack: [] //no parameter
+            });
+
+            console.log('[Uniton Connect] Request Price:', requestBody);
+
+            var makeRequest = function() {
+                return fetchWithTimeout(apiUrl, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: requestBody
+                }, 10000)
+                .then(function(response) {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                });
+            };
+
+            retryWithBackoff(makeRequest, 3, 1000)
+            .then(function(data) {
+                console.log('[Uniton Connect] Price Response:', data);
+
+                var price = 0;
+                if (data.ok && data.result && data.result.exit_code === 0) {
+                    if (data.result.stack && data.result.stack.length > 0) {
+                        var stackItem = data.result.stack[0];
+                        if (stackItem[0] === 'num') {
+                            price = parseInt(stackItem[1], 16);
+                        }
+                    }
+                } else {
+                    console.warn('[Uniton Connect] Failed exit code:', data.result ? data.result.exit_code : 'N/A');
+                }
+
+                var priceStr = price.toString();
+                var strPtr = tonConnect.allocString(priceStr);
+                {{{ makeDynCall('vi', 'callback') }}}(strPtr);
+                _free(strPtr);
+            })
+            .catch(function(error) {
+                console.error('[Uniton Connect] Error:', error);
+                var errPtr = tonConnect.allocString('0');
+                {{{ makeDynCall('vi', 'callback') }}}(errPtr);
+                _free(errPtr);
+            });
+        },
 
         convertBocToHashBase64: async function(claimedBoc)
         {
@@ -1249,6 +1356,12 @@ const tonConnectBridge = {
     {
         console.log(`[Uniton Connect] Get player stat called`);
         tonConnect.GetPlayerItemCount(methodName, playerAddress, callback);
+    },
+
+    GetGameInfo: function(methodName, callback)
+    {
+        console.log(`[Uniton Connect] Get game info called`);
+        tonConnect.GetGameData(methodName, callback);
     },
 
     SendTonTransactionWithMessage: function(nanoInTon,

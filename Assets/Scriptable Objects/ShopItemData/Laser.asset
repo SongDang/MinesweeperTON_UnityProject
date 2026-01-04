@@ -15,5 +15,5 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: df3c4a5241a54a540be52f79987a0a1d, type: 3}
   id: 1
   itemName: laser
-  price: 0.5
+  price: 0
   info: 'Destroys a random non-bomb stone. '
