@@ -311,7 +311,7 @@ namespace UnitonConnect.Core
 
         public void SendSmartContractTransaction(string methodPtr, string jsonParamsPtr, decimal cost = 0m)
         {
-            decimal amount = 0.05m + cost; //0.1m = gasfee
+            decimal amount = (cost > 0m) ? cost : 0.01m; //min 0.01m amount to send transaction
 
             if (!IsSupporedPlatform())
             {

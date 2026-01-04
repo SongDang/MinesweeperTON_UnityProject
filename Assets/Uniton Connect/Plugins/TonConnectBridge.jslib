@@ -716,6 +716,11 @@ const tonConnectBridge = {
                         cell.bits.writeUint(0x86821106, 32);
                         cell.bits.writeUint(params.qty, 32);
                         break;
+                    
+                    case "buy_upgrade":
+                        cell.bits.writeUint(0x7AE5EF0, 32);
+                        cell.bits.writeUint(params.upgradeType, 32);
+                        break;
 
                     default:
                         console.error("Unknown method: " + method);

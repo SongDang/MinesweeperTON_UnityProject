@@ -356,6 +356,30 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnLevelDigCallback(string level)
+        {
+            UnitonConnectLogger.Log($"Player level dig received: {level}");
+            OnLevelDigReceived?.Invoke(level);
+            OnLevelDigReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnLevelHeartCallback(string level)
+        {
+            UnitonConnectLogger.Log($"Player level heart received: {level}");
+            OnLevelHeartReceived?.Invoke(level);
+            OnLevelHeartReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnLevelOreCallback(string level)
+        {
+            UnitonConnectLogger.Log($"Player level ore received: {level}");
+            OnLevelOreReceived?.Invoke(level);
+            OnLevelOreReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnPlayerScoreCallback(string score)
         {
             UnitonConnectLogger.Log($"Player score received: {score}");
@@ -522,6 +546,9 @@ namespace UnitonConnect.Core
         private static Action<string> OnPlayerScoreReceived;
         private static Action<string> OnPlayerHeartReceived;
         private static Action<string> OnPlayerLaserReceived;
+        private static Action<string> OnLevelDigReceived;
+        private static Action<string> OnLevelHeartReceived;
+        private static Action<string> OnLevelOreReceived;
 
         private static Action<string> OnPriceHeartReceived;
         private static Action<string> OnPriceLaserReceived;
@@ -617,25 +644,50 @@ namespace UnitonConnect.Core
 
         internal static void GetPlayerItemCount(string methodName, string playerAddress, Action<string> callback)
         {
-            UnitonConnectLogger.Log("TonConnectBridge GetPlayerStat");
+            UnitonConnectLogger.Log($"TonConnectBridge GetPlayerStat: {methodName}");
 
-            if(methodName== "get_heart")
+            Action<string> targetNativeCallback = null;
+
+            switch (methodName)
             {
-                OnPlayerHeartReceived = callback;
+                case "get_heart":
+                    OnPlayerHeartReceived = callback;
+                    targetNativeCallback = OnPlayerHeartCallback;
+                    break;
 
-                Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
-                    GetPlayerStat(methodName, bounceableAddress, OnPlayerHeartCallback);
+                case "get_laser":
+                    OnPlayerLaserReceived = callback;
+                    targetNativeCallback = OnPlayerLaserCallback;
+                    break;
+
+                case "get_levelDig":
+                    OnLevelDigReceived = callback;
+                    targetNativeCallback = OnLevelDigCallback;
+                    break;
+
+                case "get_levelHeart":
+                    OnLevelHeartReceived = callback;
+                    targetNativeCallback = OnLevelHeartCallback;
+                    break;
+
+                case "get_levelOre":
+                    OnLevelOreReceived = callback;
+                    targetNativeCallback = OnLevelOreCallback;
+                    break;
+
+                default:
+                    UnitonConnectLogger.LogError($"Method name '{methodName}' is not supported!");
+                    return;
+            }
+
+            if (targetNativeCallback != null)
+            {
+                Utils.Address.ToBounceable(playerAddress, (bounceableAddress) =>
+                {
+                    GetPlayerStat(methodName, bounceableAddress, targetNativeCallback);
                 });
             }
-            else
-            {
-                OnPlayerLaserReceived = callback;
 
-                Utils.Address.ToBounceable(playerAddress, (bounceableAddress) => {
-                    GetPlayerStat(methodName, bounceableAddress, OnPlayerLaserCallback);
-                });
-            }
-                    
         }
 
         internal static void GetGameStat(string methodName, Action<string> callback)

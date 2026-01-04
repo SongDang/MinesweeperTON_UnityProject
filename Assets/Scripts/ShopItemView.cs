@@ -54,7 +54,6 @@ public class ShopItemView : MonoBehaviour
             });
         }
 
-      
     }
     private void SetPrice(string result)
     {
