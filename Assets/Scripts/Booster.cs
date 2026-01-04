@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnitonConnect.Core.Utils.Debugging;
+using UnitonConnect.Core;
 
 public class Booster : MonoBehaviour
 {
@@ -24,6 +26,62 @@ public class Booster : MonoBehaviour
         if (Game.Instance.GetIsFlooding())
             return;
 
+        int.TryParse(PlayerStatsManager.Instance.laser, out int currentLaser);
+        if (currentLaser <= 0)
+        {
+            UnitonConnectLogger.Log("Not enough laser");
+            //pop up
+            return;
+        }
+
+        //loading
+
+        UnitonConnectSDK.Instance.OnTonTransactionSended += OnTxSuccess;
+        UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnTxFailed;
+
+        string jsonParams = "{\"qty\": 1}"; //1 item
+        UnitonConnectSDK.Instance.SendSmartContractTransaction("use_laser", jsonParams);
+    }
+
+    private void OnTxFailed(string errorMsg)
+    {
+        UnitonConnectLogger.LogError("Use laser failed: " + errorMsg);
+
+        Cleanup();
+    }
+
+    private void OnTxSuccess(string transactionHash)
+    {
+        UnitonConnectLogger.Log("Use laser success, hash: " + transactionHash);
+
+        Cleanup();
+
+        //PlayerStatsManager.Instance.heart--; 
+        ActiveLaser();
+    }
+
+    public void removeResult()
+    {
+        resultText.gameObject.SetActive(false);
+    }
+
+    private void Cleanup()
+    {
+        //cancel loading pop up;
+
+        if (UnitonConnectSDK.Instance != null)
+        {
+            UnitonConnectSDK.Instance.OnTonTransactionSended -= OnTxSuccess;
+            UnitonConnectSDK.Instance.OnTonTransactionSendFailed -= OnTxFailed;
+        }
+    }
+    private void OnDestroy()
+    {
+        Cleanup();
+    }
+
+    private void ActiveLaser()
+    {
         resultText.text = "Laser On!";
         resultText.gameObject.SetActive(true);
         Invoke("removeResult", 1f);
@@ -44,7 +102,7 @@ public class Booster : MonoBehaviour
                 }
             }
         }
-        if(listCanDigCell.Count == 0) return;
+        if (listCanDigCell.Count == 0) return;
 
         Cell randomCell = listCanDigCell[Random.Range(0, listCanDigCell.Count)];
         if (!Game.Instance.generated)
@@ -57,17 +115,12 @@ public class Booster : MonoBehaviour
 
         //Kiem tra neu hieu ung kich hoat ben ngoai camera thi dich chuyen toi do
         Vector3 viewportPosition = Camera.main.WorldToViewportPoint(laserEffect.transform.position);
-        if(viewportPosition.x <= 0f || viewportPosition.x >= 1f || viewportPosition.y <= 0f || viewportPosition.y >= 0.9f)
+        if (viewportPosition.x <= 0f || viewportPosition.x >= 1f || viewportPosition.y <= 0f || viewportPosition.y >= 0.9f)
             Camera.main.transform.position = new Vector3(laserEffect.transform.position.x, laserEffect.transform.position.y, Camera.main.transform.position.z);
 
         Destroy(laserEffect, 0.5f);
         Game.Instance.Reveal(randomCell);
 
         Game.Instance.SaveData();
-    }
-
-    public void removeResult()
-    {
-        resultText.gameObject.SetActive(false);
     }
 }

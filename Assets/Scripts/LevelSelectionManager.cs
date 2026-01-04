@@ -65,4 +65,9 @@ public class LevelSelectionManager : MonoBehaviour
             UnitonConnectSDK.Instance.OnTonTransactionSendFailed -= OnTxFailed;
         }
     }
+
+    private void OnDestroy()
+    {
+        Cleanup();
+    }
 }
