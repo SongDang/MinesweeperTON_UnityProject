@@ -699,22 +699,22 @@ const tonConnectBridge = {
 
                     case "buy_heart":
                         cell.bits.writeUint(0xC63CDE42, 32);
-                        cell.bits.writeUint(params.quantity, 32);
+                        cell.bits.writeUint(params.qty, 32);
                         break;
                     
                     case "buy_laser":
                         cell.bits.writeUint(0xC3B889DA, 32);
-                        cell.bits.writeUint(params.quantity, 32);
+                        cell.bits.writeUint(params.qty, 32);
                         break;
                     
                     case "use_heart":
                         cell.bits.writeUint(0xD5E8C916, 32);
-                        cell.bits.writeUint(params.quantity, 32);
+                        cell.bits.writeUint(params.qty, 32);
                         break;
                     
                     case "use_laser":
                         cell.bits.writeUint(0x86821106, 32);
-                        cell.bits.writeUint(params.quantity, 32);
+                        cell.bits.writeUint(params.qty, 32);
                         break;
 
                     default:
