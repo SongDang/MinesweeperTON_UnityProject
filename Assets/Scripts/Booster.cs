@@ -9,7 +9,7 @@ public class Booster : MonoBehaviour
 
     public void AutoLaser()
     {
-        if (Game.Instance._userDatas.diamond >= 5)
+        /*if (Game.Instance._userDatas.diamond >= 5)
         {
             Game.Instance._userDatas.diamond -= 5;
         }
@@ -19,7 +19,10 @@ public class Booster : MonoBehaviour
             resultText.gameObject.SetActive(true);
             Invoke("removeResult", 1f);
             return;
-        }
+        }*/
+
+        if (Game.Instance.GetIsFlooding())
+            return;
 
         resultText.text = "Laser On!";
         resultText.gameObject.SetActive(true);

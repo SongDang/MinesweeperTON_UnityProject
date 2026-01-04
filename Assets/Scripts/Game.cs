@@ -70,6 +70,7 @@ public class Game : MonoBehaviour
     public GameObject gameoverscreen;
     public GameObject gamewinscreen;
     public GameObject rewardPopup;
+    public GameObject surePopup;
 
     public UserDatas _userDatas;
     public const string DATA_KEY = "DATA_KEY";
@@ -359,6 +360,11 @@ public class Game : MonoBehaviour
         CheckReward();
     }
 
+    public bool GetIsFlooding()
+    {
+        return isFlooding;
+    }
+
     private void Flag()
     {
         if (!TryGetCellAtMousePosition(out Cell cell)) return;
@@ -547,7 +553,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    public void GetReward()
+    public void GetRewardOre()
     {
         goldCount = 0;
         diamondCount = 0;
@@ -557,14 +563,37 @@ public class Game : MonoBehaviour
         rewardPopup.SetActive(false);
     }
 
+    public void GetRewardWin() //get reward win and backhome
+    {
+
+        BackToHome();  
+    }
+
     public void DropReward()
     {
         goldCount = 0;
         diamondCount = 0;
-
         holdTime = 0f;
 
-        rewardPopup.SetActive(false);
+        surePopup.SetActive(true);
+    }
+
+    public void OnclickYesSure()
+    {
+        if (rewardPopup.activeSelf)
+            rewardPopup.SetActive(false); //drop dig
+        else if(gamewinscreen.activeSelf)
+        {
+            //drop reward win and back home
+            BackToHome();
+        }
+            
+        surePopup.SetActive(false);
+    }
+
+    public void OnclickNoSure()
+    {
+        surePopup.SetActive(false);
     }
 
     private IEnumerator MoveAndHandleObject(GameObject obj)
@@ -655,9 +684,9 @@ public class Game : MonoBehaviour
 
     }
 
-    public void Backtomenu()
+    public void BackToHome()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Menu");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Home");
     }
 
     public void SpawnBug(Cell cell)
