@@ -14,7 +14,7 @@ public class Sweeper : MonoBehaviour
 
         if (Game.Instance.sweepmode == -1)
         {
-            if (Game.Instance._userDatas.gold >= 1)
+            /*if (Game.Instance._userDatas.gold >= 1)
             {
                 Game.Instance._userDatas.gold -= 1;
             }
@@ -24,7 +24,7 @@ public class Sweeper : MonoBehaviour
                 resultText.gameObject.SetActive(true);
                 Invoke("removeResult", 1f);
                 return;
-            }
+            }*/
             resultText.text = "Activated!";
             resultText.gameObject.SetActive(true);
             Invoke("removeResult", 1f);
