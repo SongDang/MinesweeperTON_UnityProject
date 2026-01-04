@@ -21,7 +21,7 @@ public class PlayerStatsManager : MonoBehaviour
         if (UnitonConnectSDK.Instance == null)
         {
             Debug.Log("UnitonConnectSDK null");
-            UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
+            //UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
             return;
         }
 
