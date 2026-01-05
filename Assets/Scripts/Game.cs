@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 using UnitonConnect.Core;
+using UnitonConnect.Core.Utils.Debugging;
 
 public class Game : MonoBehaviour
 {
@@ -89,7 +90,7 @@ public class Game : MonoBehaviour
     private int goldCount = 0;
     private int diamondCount = 0;
     private int floodingCount;
-    private float tonCoin = 0f;
+    private decimal tonCoin = 0m;
     private bool isFlooding = false;
 
     private void OnValidate()
@@ -552,7 +553,7 @@ public class Game : MonoBehaviour
 
         if (goldCount > 0 || diamondCount > 0)
         {
-            
+            tonCoin += goldCount * GameStatsManager.Instance.PriceGold + diamondCount*GameStatsManager.Instance.PriceDiamond;
             AdjustText();
             rewardPopup.SetActive(true);
         }
@@ -560,7 +561,7 @@ public class Game : MonoBehaviour
 
     public void GetRewardOre()
     {
-        UnitonConnectSDK.Instance
+        Sell();
 
         goldCount = 0;
         diamondCount = 0;
@@ -568,6 +569,29 @@ public class Game : MonoBehaviour
         holdTime = 0f;
 
         rewardPopup.SetActive(false);
+    }
+
+    public void Sell()
+    {
+        long nanoAmount = (long)(tonCoin * 1_000_000_000m);
+        Debug.Log($"Sell ore: {tonCoin} TON -> {nanoAmount} NanoTON");
+
+        //{ } + ($) -> {{ }}
+        string jsonParams = $"{{\"amountReward\": {nanoAmount}}}";
+        UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleClaimRewardResult, "claim_reward", jsonParams);
+    }
+
+    private void HandleClaimRewardResult(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            UnitonConnectSDK.Instance.LoadBalance();
+            UnitonConnectLogger.Log("Claim reward success");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Claim reward failed");
+        }
     }
 
     public void GetRewardWin() //get reward win and backhome

@@ -27,48 +27,22 @@ public class ShopItemView : MonoBehaviour
         infoText.text = data.info;
 
         //priceText.text = data.price.ToString();
-        FetchItemPrice(data);
+        //FetchItemPrice(data);
+        if (data.itemName == "heart")
+        {
+            _data.price = GameStatsManager.Instance.PriceHeart;
+        }
+        else
+        {
+            _data.price = GameStatsManager.Instance.PriceLaser;
+        }
+
+        if (priceText != null)
+        {
+            priceText.text = $"{_data.price:0.##}";
+        }
 
         purchaseButton.onClick.RemoveAllListeners();
         purchaseButton.onClick.AddListener(() => _onPurchaseClicked?.Invoke(_data));
     }
-
-    public void FetchItemPrice(ShopItemData data)
-    {
-        if(data.itemName == "heart")
-        {
-            UnitonConnectSDK.Instance.GetGameData("get_price_heart", (result) =>
-            {
-                Debug.Log($"Heart price updated: {result}");
-
-                SetPrice(result);
-            });
-        }
-        else
-        {
-            UnitonConnectSDK.Instance.GetGameData("get_price_laser", (result) =>
-            {
-                Debug.Log($"Laser price updated: {result}");
-
-                SetPrice(result);
-            });
-        }
-
-    }
-    private void SetPrice(string result)
-    {
-        if (decimal.TryParse(result, out decimal nanoPrice))
-        {
-            decimal realPrice = nanoPrice / 1_000_000_000m;
-
-            _data.price = realPrice;
-
-            if (priceText != null)
-                priceText.text = $"{realPrice:0.##}";
-        }
-        else
-        {
-            if (priceText != null) priceText.text = "Error";
-        }
-    }    
 }

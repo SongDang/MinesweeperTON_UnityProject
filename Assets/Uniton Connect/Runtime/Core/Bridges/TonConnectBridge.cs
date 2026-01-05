@@ -348,6 +348,14 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnAllGameStatsCallback(string json)
+        {
+            UnitonConnectLogger.Log($"All Game stats received: {json}");
+            OnAllGameStatsReceived?.Invoke(json);
+            OnAllGameStatsReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnPlayerLaserCallback(string itemCount)
         {
             UnitonConnectLogger.Log($"Player laser received: {itemCount}");
@@ -561,6 +569,7 @@ namespace UnitonConnect.Core
 
         private static Action<string> OnPriceHeartReceived;
         private static Action<string> OnPriceLaserReceived;
+        private static Action<string> OnAllGameStatsReceived;
 
         private static Action<string> OnJettonTransactionSended;
         private static Action<string> OnJettonTransactionSendFailed;
@@ -714,11 +723,17 @@ namespace UnitonConnect.Core
 
                 GetGameInfo(methodName, OnPriceHeartCallback);
             }
-            else
+            else if (methodName == "get_price_laser")
             {
                 OnPriceLaserReceived = callback;
 
                 GetGameInfo(methodName, OnPriceLaserCallback);
+            }
+            else if (methodName == "get_all_prices")
+            {
+                OnAllGameStatsReceived = callback;
+
+                GetGameInfo(methodName, OnAllGameStatsCallback);
             }
 
         }

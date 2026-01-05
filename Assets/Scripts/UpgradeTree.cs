@@ -52,7 +52,10 @@ public class UpgradeTree : MonoBehaviour
 
         SetupButtonListeners();
 
-        FetchUpgradePrices();
+        //FetchUpgradePrices();
+        cachedPrices[UpgradeType.DigSpeed] = GameStatsManager.Instance.PriceUpgrade;
+        cachedPrices[UpgradeType.MaxHeart] = GameStatsManager.Instance.PriceUpgrade;
+        cachedPrices[UpgradeType.OreLuck] = GameStatsManager.Instance.PriceUpgrade;
 
         UpdateTreeUI();
         SubscribeEvents();
