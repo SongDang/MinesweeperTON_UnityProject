@@ -380,6 +380,14 @@ namespace UnitonConnect.Core
         }
 
         [MonoPInvokeCallback(typeof(Action<string>))]
+        private static void OnPlayerInfoCallback(string playerInfo)
+        {
+            UnitonConnectLogger.Log($"Player info received: {playerInfo}");
+            OnPlayerInfoReceived?.Invoke(playerInfo);
+            OnPlayerInfoReceived = null; // Clear after use
+        }
+
+        [MonoPInvokeCallback(typeof(Action<string>))]
         private static void OnPlayerScoreCallback(string score)
         {
             UnitonConnectLogger.Log($"Player score received: {score}");
@@ -549,6 +557,7 @@ namespace UnitonConnect.Core
         private static Action<string> OnLevelDigReceived;
         private static Action<string> OnLevelHeartReceived;
         private static Action<string> OnLevelOreReceived;
+        private static Action<string> OnPlayerInfoReceived;
 
         private static Action<string> OnPriceHeartReceived;
         private static Action<string> OnPriceLaserReceived;
@@ -673,6 +682,11 @@ namespace UnitonConnect.Core
                 case "get_levelOre":
                     OnLevelOreReceived = callback;
                     targetNativeCallback = OnLevelOreCallback;
+                    break;
+
+                case "get_player_info":
+                    OnPlayerInfoReceived = callback;
+                    targetNativeCallback = OnPlayerInfoCallback;
                     break;
 
                 default:

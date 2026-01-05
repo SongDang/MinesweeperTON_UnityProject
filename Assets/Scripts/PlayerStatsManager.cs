@@ -4,19 +4,35 @@ using UnitonConnect.Core;
 using UnitonConnect.Core.Data;
 using System.Collections;
 
+[Serializable]
+public class PlayerInfo
+{
+    public int heart;
+    public int laser;
+    public int lastTimeReceiveHeart;
+    public int remainingHeartCooldown;
+    public int levelHeart;
+    public int levelDig;
+    public int levelOre;
+}
+
 public class PlayerStatsManager : MonoBehaviour
 {
     public static PlayerStatsManager Instance { get; private set; }
 
-    public string heart { get; private set; }
-    public string laser { get; private set; }
+    public int heart { get; private set; }
+    public int laser { get; private set; }
+    public int lastTimeReceiveHeart { get; private set; }
+    public int remainingHeartCooldown { get; private set; }
 
     public int levelDig { get; private set; }
     public int levelHeart { get; private set; }
     public int levelOre { get; private set; }
 
-    public event Action<string> OnHeartUpdated;
-    public event Action<string> OnLaserUpdated;
+    public event Action<int> OnHeartUpdated;
+    public event Action<int> OnLaserUpdated;
+    public event Action<int> OnLastTimeUpdated;
+    public event Action<int> OnRemainingCooldownUpdated;
     public event Action<int> OnLevelDigUpdated;
     public event Action<int> OnLevelHeartUpdated;
     public event Action<int> OnLevelOreUpdated;
@@ -26,6 +42,7 @@ public class PlayerStatsManager : MonoBehaviour
     private const string GetLevelDigMethod = "get_levelDig";
     private const string GetLevelHeartMethod = "get_levelHeart";
     private const string GetLevelOreMethod = "get_levelOre";
+    private const string GetPlayerInfo = "get_player_info";
 
     private void Start()
     {
@@ -41,23 +58,63 @@ public class PlayerStatsManager : MonoBehaviour
 
     private void FetchAllStats()
     {
-        StartCoroutine(FetchStatsRoutine());
-    }
-    private IEnumerator FetchStatsRoutine()
-    {
-        FetchHeartCount();
-        yield return new WaitForSeconds(0.3f);
+        //call get_player_info
+        if (!UnitonConnectSDK.Instance.IsWalletConnected) return;
 
-        FetchLaserCount();
-        yield return new WaitForSeconds(0.3f);
+        string playerAddress = UnitonConnectSDK.Instance.Wallet.ToString();
+        UnitonConnectSDK.Instance.GetPlayerStat(GetPlayerInfo, playerAddress, (jsonResult) =>
+        {
+            try
+            {
+                Debug.Log($"[FetchAllStats] Received JSON: {jsonResult}");
 
-        FetchLevelDig();
-        yield return new WaitForSeconds(0.3f);
+                PlayerInfo info = JsonUtility.FromJson<PlayerInfo>(jsonResult);
 
-        FetchLevelHeart();
-        yield return new WaitForSeconds(0.3f);
+                Debug.Log($"[FetchAllStats] Parsed:\n" +
+                            $"- Heart: {info.heart}\n" +
+                            $"- Laser: {info.laser}\n" +
+                            $"- LastTime: {info.lastTimeReceiveHeart}\n" +
+                            $"- RemainingHeartCooldown: {info.remainingHeartCooldown}\n" +
+                            $"- LvlDig: {info.levelDig}\n" +
+                            $"- LvlHeart: {info.levelHeart}\n" +
+                            $"- LvlOre: {info.levelOre}");
 
-        FetchLevelOre();
+                heart = info.heart;
+                laser = info.laser;
+                lastTimeReceiveHeart = info.lastTimeReceiveHeart;
+                remainingHeartCooldown = info.remainingHeartCooldown;
+                levelDig = info.levelDig;
+                levelHeart = info.levelHeart;
+                levelOre = info.levelOre;
+
+                // Invoke events
+                OnHeartUpdated?.Invoke(heart);
+                OnLaserUpdated?.Invoke(laser);
+                OnLastTimeUpdated?.Invoke(lastTimeReceiveHeart);
+                OnRemainingCooldownUpdated?.Invoke(remainingHeartCooldown);
+                OnLevelHeartUpdated?.Invoke(levelHeart);
+                OnLevelDigUpdated?.Invoke(levelDig);
+                OnLevelOreUpdated?.Invoke(levelOre);
+
+                Debug.Log($"[FetchAllStats] All stats updated successfully!");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[FetchAllStats] Failed to parse: {e.Message}");
+
+                // Use default values on error
+                heart = 0;
+                laser = 0;
+                lastTimeReceiveHeart = 0;
+                remainingHeartCooldown = 0;
+                levelDig = 1;
+                levelHeart = 1;
+                levelOre = 1;
+
+                OnHeartUpdated?.Invoke(heart);
+                OnLaserUpdated?.Invoke(laser);
+            }
+        });
     }
 
     private void Awake()
@@ -88,7 +145,8 @@ public class PlayerStatsManager : MonoBehaviour
         {
             Debug.Log($"Heart updated: {result}");
 
-            heart = result;
+            int.TryParse(result, out int resultInt);
+            heart = resultInt;
             OnHeartUpdated?.Invoke(heart);
         });
     }
@@ -101,7 +159,8 @@ public class PlayerStatsManager : MonoBehaviour
         {
             Debug.Log($"Laser updated: {result}");
 
-            laser = result;
+            int.TryParse(result, out int resultInt);
+            laser = resultInt;
             OnLaserUpdated?.Invoke(laser);
         });
     }

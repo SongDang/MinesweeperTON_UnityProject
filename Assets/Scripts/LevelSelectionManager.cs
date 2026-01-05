@@ -13,15 +13,7 @@ public class LevelSelectionManager : MonoBehaviour
             return;
         }
 
-        if(PlayerStatsManager.Instance.heart == null)
-        {
-            UnitonConnectLogger.Log("Heart null");
-            return;
-        }
-
-        int currentHeart = 0;
-        int.TryParse(PlayerStatsManager.Instance.heart, out currentHeart);
-        if (currentHeart <= 0)
+        if (PlayerStatsManager.Instance.heart <= 0)
         {
             UnitonConnectLogger.Log("Not enough heart");
             //pop up

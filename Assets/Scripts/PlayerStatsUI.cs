@@ -32,26 +32,14 @@ public class PlayerStatsUI : MonoBehaviour
         }
     }
 
-    private void UpdateHeartDisplay(string heart)
-    {
-        if (heart == null)
-        {
-            Debug.Log("heart null");
-            return;
-        }    
-        
-        heartText.text = heart;
+    private void UpdateHeartDisplay(int heart)
+    {        
+        heartText.text = heart.ToString();
         Debug.Log("update heart: " + heart);
     }
-    private void UpdateLaserDisplay(string laser)
+    private void UpdateLaserDisplay(int laser)
     {
-        if (laser == null)
-        {
-            Debug.Log("laser null");
-            return;
-        } 
-
-        laserText.text = laser;
+        laserText.text = laser.ToString();
         Debug.Log("update laser: " + laser);
     }
 }

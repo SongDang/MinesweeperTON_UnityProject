@@ -26,8 +26,7 @@ public class Booster : MonoBehaviour
         if (Game.Instance.GetIsFlooding())
             return;
 
-        int.TryParse(PlayerStatsManager.Instance.laser, out int currentLaser);
-        if (currentLaser <= 0)
+        if (PlayerStatsManager.Instance.laser <= 0)
         {
             UnitonConnectLogger.Log("Not enough laser");
             //pop up

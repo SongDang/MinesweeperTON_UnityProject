@@ -4,7 +4,7 @@ const tonConnectBridge = {
     // Class definition
 
     $tonConnect: {
-        CONTRACT_ADDRESS: "kQCRlx2PXaB6y6rdUB6NaLIwzHPeaEK2kJUCr5ilYGKosN05",
+        CONTRACT_ADDRESS: "kQBuyOVR854P_CSCzvH6FJnMTLqgRs2ekaBTobhOeMQuYcXx",
 
         allocString: function (stringData)
         {
@@ -937,7 +937,15 @@ const tonConnectBridge = {
             if (!tonWeb) 
             {
                 console.error('[Uniton Connect] TonWeb not initialized!');
-                 errPtr = tonConnect.allocString('0');
+                var failResult = '0'
+                if (methodName === "get_player_info") {
+                    failResult = JSON.stringify({
+                        heart: 0, laser: 0, lastTimeReceiveHeart: 0, 
+                        remainingHeartCooldown: 0, levelHeart: 1, levelDig: 1, levelOre: 1
+                    });
+                }
+
+                errPtr = tonConnect.allocString(failResult);
                 {{{ makeDynCall('vi', 'callback') }}}(errPtr);
                 _free(errPtr);
                 return;
@@ -949,11 +957,11 @@ const tonConnectBridge = {
         
                 var tryRequest = function() {
                     attempt++;
-                    console.log('[Uniton Connect] Attempt ' + attempt + '/' + maxRetries);
+                    console.log('[Uniton Connect] Attempt ' + attempt + '/' + maxRetries + ': ' + methodName);
             
                     return fn().catch(function(error) {
                         if (attempt >= maxRetries) {
-                            console.error('[Uniton Connect] All ' + maxRetries + ' attempts failed');
+                            console.error('[Uniton Connect] All ' + maxRetries + ' attempts failed: ' + methodName);
                             throw error;
                         }
                 
@@ -1033,32 +1041,93 @@ const tonConnectBridge = {
             .then(function(data) {
                 console.log('[Uniton Connect] API Response:', data);
                 console.log('[Uniton Connect] Exit code:', data.result ? data.result.exit_code : 'N/A');
-        
+
                 var item = 0;
-                if (data.ok && data.result && data.result.exit_code === 0) {
-                if (data.result.stack && data.result.stack.length > 0) {
-                        var stackItem = data.result.stack[0];
-                        console.log('[Uniton Connect] Stack item:', stackItem);
-                
-                        if (stackItem[0] === 'num') {
-                            item = parseInt(stackItem[1], 16);
-                            console.log('[Uniton Connect] Item (decimal):', item);
+                var itemJson = JSON.stringify({
+                    heart: 0, laser: 0, lastTimeReceiveHeart: 0, 
+                    remainingHeartCooldown: 0, levelHeart: 1, levelDig: 1, levelOre: 1
+                });
+
+                if (data.ok && data.result && data.result.exit_code === 0) 
+                {
+                    if (data.result.stack && data.result.stack.length > 0) {
+                        if(methodName == "get_player_info")
+                        {
+                            var stack = data.result.stack;
+                            var info = {
+                                heart: 0,
+                                laser: 0,
+                                lastTimeReceiveHeart: 0,
+                                remainingHeartCooldown: 0,
+                                levelHeart: 0,
+                                levelDig: 0,
+                                levelOre: 0
+                            };
+
+                            var getVal = function(i) { 
+                                return (stack.length > i && stack[i][0] === 'num') ? parseInt(stack[i][1], 16) : 0; 
+                            };
+
+                            info.heart = getVal(1);
+                            info.laser = getVal(2);
+                            info.lastTimeReceiveHeart = getVal(3);
+                            info.remainingHeartCooldown = getVal(4);
+                            info.levelHeart = getVal(5);
+                            info.levelDig = getVal(6);
+                            info.levelOre = getVal(7);
+
+                            itemJson = JSON.stringify(info);
                         }
-                }
-                } else {
+                        else
+                        {
+                            var stackItem = data.result.stack[0];
+                            console.log('[Uniton Connect] Stack item:', stackItem);
+                
+                            if (stackItem[0] === 'num') {
+                                item = parseInt(stackItem[1], 16);
+                                console.log('[Uniton Connect] Item (decimal):', item);
+                            }
+                        }
+                    }
+                } 
+                else 
+                {
                     console.warn('[Uniton Connect] Failed - exit code:', data.result ? data.result.exit_code : 'N/A');
                 }
         
-                var itemStr = item.toString();
-                var strPtr = tonConnect.allocString(itemStr);
+                var strPtr;
+                if(methodName=="get_player_info")
+                {
+                    strPtr = tonConnect.allocString(itemJson);
+                }
+                else
+                {
+                    var itemStr = item.toString();
+                    strPtr = tonConnect.allocString(itemStr);
+                    
+                    console.log('[Uniton Connect] Returning to Unity:', itemStr);
+                }
 
-                console.log('[Uniton Connect] Returning to Unity:', itemStr);
                 {{{ makeDynCall('vi', 'callback') }}}(strPtr);
                 _free(strPtr);
             })
             .catch(function(error) {
                 console.error('[Uniton Connect] Error:', error);
-                var errPtr = tonConnect.allocString('0');
+
+                var errPtr;
+                if(methodName=="get_player_info")
+                {  
+                    errPtr = tonConnect.allocString(JSON.stringify({
+                        heart: 0, laser: 0, lastTimeReceiveHeart: 0, 
+                        remainingHeartCooldown: 0, levelHeart: 1, levelDig: 1, levelOre: 1
+                    }));
+                    
+                }
+                else   
+                {
+                    errPtr = tonConnect.allocString('0');
+                }
+
                 {{{ makeDynCall('vi', 'callback') }}}(errPtr);
                 _free(errPtr);
             });
