@@ -26,8 +26,20 @@ public class LevelSelectionManager : MonoBehaviour
         UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnTxFailed;
 
         string jsonParams = "{\"qty\": 1}"; //1 item
-        UnitonConnectSDK.Instance.SendSmartContractTransaction("use_heart", jsonParams);
+        UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleUseHeartResult, "use_heart", jsonParams);
 
+    }
+    private void HandleUseHeartResult(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            PlayerStatsManager.Instance.AddHeart(-1);
+            UnitonConnectLogger.Log("Use heart success, heart - 1");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Use heart failed");
+        }
     }
 
     private void OnTxFailed(string errorMsg)

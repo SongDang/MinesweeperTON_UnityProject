@@ -39,7 +39,20 @@ public class Booster : MonoBehaviour
         UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnTxFailed;
 
         string jsonParams = "{\"qty\": 1}"; //1 item
-        UnitonConnectSDK.Instance.SendSmartContractTransaction("use_laser", jsonParams);
+        UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleUseLaserResult, "use_laser", jsonParams);
+    }
+
+    private void HandleUseLaserResult(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            PlayerStatsManager.Instance.AddLaser(-1);
+            UnitonConnectLogger.Log("Use laser success, laser - 1");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Use laser failed");
+        }
     }
 
     private void OnTxFailed(string errorMsg)

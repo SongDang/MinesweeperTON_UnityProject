@@ -225,40 +225,45 @@ public class UpgradeTree : MonoBehaviour
 
         string jsonParams = $"{{ \"upgradeType\": {(int)selectedType} }}";
 
-        UnitonConnectSDK.Instance.OnTonTransactionSended += OnUpgradeSuccess;
-        UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnUpgradeFailed;
+        //UnitonConnectSDK.Instance.OnTonTransactionSended += OnUpgradeSuccess;
+        //UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnUpgradeFailed;
 
         btnConfirm.interactable = false;
 
-        UnitonConnectSDK.Instance.SendSmartContractTransaction("buy_upgrade", jsonParams, currentCost);
+        UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleBuyUpgradeResult, "buy_upgrade", jsonParams, currentCost);
     }
-
-    private void OnUpgradeFailed(string error)
+    private void HandleBuyUpgradeResult(bool isSuccess)
     {
-        UnitonConnectLogger.Log("Upgrade failed, error: " + error);
-        CleanupTransaction();
+        if (isSuccess)
+        {
+            //real update
+            OnUpgradeSuccess();
+            UnitonConnectLogger.Log("Buy upgrade success, level + 1");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Buy upgrade failed");
+        }
+
+        btnConfirm.interactable = true;
     }
-
-    private void OnUpgradeSuccess(string hash)
+    private void OnUpgradeSuccess()
     {
-        UnitonConnectLogger.Log("Upgrade success, transaction hash: " + hash);
         AudioManager.Instance.WinSound();
 
-        ApplyUpgradeEffect();
-
-        //Game.Instance.SaveData();
-        UpdateTreeUI();
-
-        CleanupTransaction();
-    }
-
-    private void CleanupTransaction()
-    {
-        btnConfirm.interactable = true;
-        if (UnitonConnectSDK.Instance != null)
+        switch (selectedType)
         {
-            UnitonConnectSDK.Instance.OnTonTransactionSended -= OnUpgradeSuccess;
-            UnitonConnectSDK.Instance.OnTonTransactionSendFailed -= OnUpgradeFailed;
+            case UpgradeType.DigSpeed:
+                PlayerStatsManager.Instance.LevelUpDig(); //also update ui
+                break;
+
+            case UpgradeType.MaxHeart:
+                PlayerStatsManager.Instance.LevelUpHeart();
+                break;
+
+            case UpgradeType.OreLuck:
+                PlayerStatsManager.Instance.LevelUpOre();
+                break;
         }
     }
 
@@ -301,7 +306,5 @@ public class UpgradeTree : MonoBehaviour
             playerStatsManager.OnLevelHeartUpdated -= UpdateHeartUI;
             playerStatsManager.OnLevelOreUpdated -= UpdateOreUI;
         }
-
-        CleanupTransaction();
     }
 }

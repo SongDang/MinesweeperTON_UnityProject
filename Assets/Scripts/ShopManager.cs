@@ -55,7 +55,8 @@ public class ShopManager : MonoBehaviour
         {
             string jsonParams = "{\"qty\": 1}"; //1 item
             decimal itemPrice = item.price;
-            sdk.SendSmartContractTransaction("buy_heart", jsonParams, itemPrice);
+
+            sdk.SendSmartContractTransaction(HandleBuyHeartResult, "buy_heart", jsonParams, itemPrice);
 
             Debug.Log($"Buy: heart with {item.price} TON");
         }
@@ -63,9 +64,34 @@ public class ShopManager : MonoBehaviour
         {
             string jsonParams = "{\"qty\": 1}"; //1 item
             decimal itemPrice = item.price;
-            sdk.SendSmartContractTransaction("buy_laser", jsonParams, itemPrice);
+            sdk.SendSmartContractTransaction(HandleBuyLaserResult, "buy_laser", jsonParams, itemPrice);
 
             Debug.Log($"Buy: laser with {item.price} TON");
+        }
+    }
+
+    private void HandleBuyHeartResult(bool isSuccess)
+    {
+        if(isSuccess)
+        {
+            PlayerStatsManager.Instance.AddHeart(1);
+            UnitonConnectLogger.Log("Buy heart success, heart + 1");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Buy heart failed");
+        }
+    }
+    private void HandleBuyLaserResult(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            PlayerStatsManager.Instance.AddLaser(1);
+            UnitonConnectLogger.Log("Buy laser success, laser + 1");
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Buy laser failed");
         }
     }
 

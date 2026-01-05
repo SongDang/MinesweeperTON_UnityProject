@@ -309,7 +309,7 @@ namespace UnitonConnect.Core
                 message, OnSendingTonFinish, OnSendingTonFail);
         }
 
-        public void SendSmartContractTransaction(string methodPtr, string jsonParamsPtr, decimal cost = 0m)
+        public void SendSmartContractTransaction(Action<bool> onSuccess, string methodPtr, string jsonParamsPtr, decimal cost = 0m)
         {
             decimal amount = (cost > 0m) ? cost : 0.01m; //min 0.01m amount to send transaction
 
@@ -332,8 +332,26 @@ namespace UnitonConnect.Core
                 return;
             }
 
-            UnitonConnectLogger.Log($"Created a request to send a Transaction" +
-                $" to the SmartContract in amount {amount}");
+            UnitonConnectLogger.Log($"Created a request to send a Transaction, method: {methodPtr}" + $" to the SmartContract in amount {amount}");
+
+            void TransactionHandler(SuccessTransactionData data)
+            {
+                // unsub
+                OnTonTransactionConfirmed -= TransactionHandler;
+                OnTonTransactionSendFailed -= SendFailHandler;
+
+                onSuccess?.Invoke(data.IsSuccess);
+            }
+            void SendFailHandler(string error)
+            {
+                OnTonTransactionConfirmed -= TransactionHandler; 
+                OnTonTransactionSendFailed -= SendFailHandler; 
+
+                UnitonConnectLogger.Log($"User cancelled transaction or Error: {error}");
+                onSuccess?.Invoke(false); //failed
+            }
+            OnTonTransactionConfirmed += TransactionHandler;
+            OnTonTransactionSendFailed += SendFailHandler;
 
             TonConnectBridge.SendTx(amount, methodPtr, 
                 jsonParamsPtr, OnSendingTonFinish, OnSendingTonFail);

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
-
+using UnitonConnect.Core;
 
 public class Game : MonoBehaviour
 {
@@ -55,6 +55,7 @@ public class Game : MonoBehaviour
     public TextMeshProUGUI textdiamond;
     public TextMeshProUGUI textlevel;
     public TextMeshProUGUI textcomplete;
+    public TextMeshProUGUI tonText;
 
     public GameObject goldPrefab;
     public GameObject diamondPrefab;
@@ -88,6 +89,7 @@ public class Game : MonoBehaviour
     private int goldCount = 0;
     private int diamondCount = 0;
     private int floodingCount;
+    private float tonCoin = 0f;
     private bool isFlooding = false;
 
     private void OnValidate()
@@ -233,6 +235,8 @@ public class Game : MonoBehaviour
     {
         textgold.text = goldCount.ToString();
         textdiamond.text = diamondCount.ToString();
+
+        tonText.text = tonCoin.ToString();
         //textheart.text = heart.ToString();
         //textlevel.text = _userDatas.level.ToString();
     }
@@ -548,6 +552,7 @@ public class Game : MonoBehaviour
 
         if (goldCount > 0 || diamondCount > 0)
         {
+            
             AdjustText();
             rewardPopup.SetActive(true);
         }
@@ -555,6 +560,8 @@ public class Game : MonoBehaviour
 
     public void GetRewardOre()
     {
+        UnitonConnectSDK.Instance
+
         goldCount = 0;
         diamondCount = 0;
 
