@@ -3442,7 +3442,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &545718457
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12640,6 +12640,7 @@ MonoBehaviour:
   textdiamond: {fileID: 1601007002}
   textlevel: {fileID: 964861172}
   textcomplete: {fileID: 2139690812}
+  tonText: {fileID: 638857511}
   goldPrefab: {fileID: 6127283333846756172, guid: c63566adec60af64aa7c9b258cdf8fbf, type: 3}
   diamondPrefab: {fileID: 6596698295473145215, guid: 1024f3a993e5edb43ae94e5d889a6c2c, type: 3}
   bagIcon: {fileID: 168666674}
