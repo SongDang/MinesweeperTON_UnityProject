@@ -334,27 +334,49 @@ namespace UnitonConnect.Core
 
             UnitonConnectLogger.Log($"Created a request to send a Transaction, method: {methodPtr}" + $" to the SmartContract in amount {amount}");
 
-            void TransactionHandler(SuccessTransactionData data)
+            void TransactionSentHandler(string transactionHash)
             {
-                // unsub
-                OnTonTransactionConfirmed -= TransactionHandler;
+                OnTonTransactionSended -= TransactionSentHandler;
                 OnTonTransactionSendFailed -= SendFailHandler;
 
-                onSuccess?.Invoke(data.IsSuccess);
+                UnitonConnectLogger.Log($"Transaction sent successfully with Hash: {transactionHash}");
+                //onSuccess?.Invoke(true);
+                if (gameObject.activeInHierarchy)
+                {
+                    StartCoroutine(InvokeCallbackNextFrame(onSuccess, true));
+                }
             }
+
             void SendFailHandler(string error)
             {
-                OnTonTransactionConfirmed -= TransactionHandler; 
-                OnTonTransactionSendFailed -= SendFailHandler; 
+                OnTonTransactionSended -= TransactionSentHandler;
+                OnTonTransactionSendFailed -= SendFailHandler;
 
                 UnitonConnectLogger.Log($"User cancelled transaction or Error: {error}");
-                onSuccess?.Invoke(false); //failed
+                //onSuccess?.Invoke(false); //failed
+                if (gameObject.activeInHierarchy)
+                {
+                    StartCoroutine(InvokeCallbackNextFrame(onSuccess, false));
+                }
             }
-            OnTonTransactionConfirmed += TransactionHandler;
+            OnTonTransactionSended += TransactionSentHandler;
             OnTonTransactionSendFailed += SendFailHandler;
 
             TonConnectBridge.SendTx(amount, methodPtr, 
                 jsonParamsPtr, OnSendingTonFinish, OnSendingTonFail);
+        }
+        private IEnumerator InvokeCallbackNextFrame(Action<bool> callback, bool result)
+        {
+            // Wait 1 frame for JS return all value
+            yield return null;
+            try
+            {
+                callback?.Invoke(result);
+            }
+            catch (Exception ex)
+            {
+                UnitonConnectLogger.LogError($"Error inside user callback: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         public void GetPlayerStat(string methodName, string playerAddress, Action<string> callback)
