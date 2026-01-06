@@ -174,7 +174,7 @@ public class UpgradeTree : MonoBehaviour
         {
             if (buttons[i] != null)
             {
-                bool canUpgrade = (currentLevel == i);
+                bool canUpgrade = (currentLevel == i); //lv 0,1,2 => button 0,1
                 bool isUpgraded = (currentLevel > i);
 
                 buttons[i].interactable = canUpgrade;

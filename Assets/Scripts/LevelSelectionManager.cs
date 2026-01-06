@@ -1,10 +1,23 @@
 using UnityEngine;
 using UnitonConnect.Core;
 using UnitonConnect.Core.Utils.Debugging;
+using TMPro;
 using System;
+using System.Collections;
 
 public class LevelSelectionManager : MonoBehaviour
 {
+    public GameObject failedText;
+    public GameObject Howtoplay;
+
+    public void OpenHowtoplay()
+    {
+        Howtoplay.SetActive(true);
+    }
+    public void CloseHowtoplay()
+    {
+        Howtoplay.SetActive(false);
+    }
     public void StartLevel()
     {
         if (!UnitonConnectSDK.Instance.IsWalletConnected)
@@ -40,7 +53,15 @@ public class LevelSelectionManager : MonoBehaviour
         else
         {
             UnitonConnectLogger.Log("Use heart failed");
+            StartCoroutine(ShowText(3f));
         }
+    }
+    
+    IEnumerator ShowText(float sec)
+    {
+        failedText.SetActive(true);            
+        yield return new WaitForSeconds(sec);    
+        failedText.SetActive(false);          
     }
 
     /*private void OnTxFailed(string errorMsg)

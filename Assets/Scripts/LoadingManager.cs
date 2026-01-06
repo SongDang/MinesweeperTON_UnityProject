@@ -16,7 +16,7 @@ public class LoadingManager : MonoBehaviour
 
     IEnumerator LoadGame()
     {
-        AsyncOperation load = SceneManager.LoadSceneAsync(1);
+        AsyncOperation load = SceneManager.LoadSceneAsync(2);
         load.allowSceneActivation = false;
 
         while (!load.isDone)
@@ -30,7 +30,7 @@ public class LoadingManager : MonoBehaviour
             {
                 progressBar.value = 1;
                 progressText.text = "100%";
-                yield return new WaitForSeconds(0.3f); 
+                yield return new WaitForSeconds(3f); 
                 load.allowSceneActivation = true;
             }
 

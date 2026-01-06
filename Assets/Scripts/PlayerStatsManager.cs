@@ -235,4 +235,8 @@ public class PlayerStatsManager : MonoBehaviour
         levelOre++;
         OnLevelOreUpdated?.Invoke(levelOre);
     }
+    public void SetlastTimeReceiveHeart(int time)
+    {
+        lastTimeReceiveHeart = time;
+    }
 }
