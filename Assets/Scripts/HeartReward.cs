@@ -26,7 +26,7 @@ public class HeartReward : MonoBehaviour
         UnitonConnectLogger.Log("Heart reward success, hash: " + transactionHash);
 
         int heartCount = 2 + PlayerStatsManager.Instance.levelHeart; //lv0: 2, lv1: 3, lv2: 4
-        PlayerStatsManager.Instance.AddHeart(heartCount);
+        //PlayerStatsManager.Instance.AddHeart(heartCount);
 
         Cleanup();
     }

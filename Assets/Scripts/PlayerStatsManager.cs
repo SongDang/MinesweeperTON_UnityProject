@@ -203,4 +203,36 @@ public class PlayerStatsManager : MonoBehaviour
             OnLevelOreUpdated?.Invoke(levelOre);
         });
     }
+
+    public void AddHeart(int count)
+    {
+        heart += count;
+        OnHeartUpdated?.Invoke(heart);
+    }
+    public void AddLaser(int amount)
+    {
+        laser += amount;
+        OnLaserUpdated?.Invoke(laser);
+    }
+    public void SetRemainingHeartCooldown(int seconds)
+    {
+        remainingHeartCooldown = seconds;
+        OnRemainingCooldownUpdated?.Invoke(remainingHeartCooldown);
+    }
+    public void LevelUpDig()
+    {
+        levelDig++;
+        OnLevelDigUpdated?.Invoke(levelDig);
+    }
+    public void LevelUpHeart()
+    {
+        levelHeart++;
+        OnLevelHeartUpdated?.Invoke(levelHeart);
+    }
+    public void LevelUpOre()
+    {
+        levelOre++;
+        OnLevelOreUpdated?.Invoke(levelOre);
+
+    }
 }

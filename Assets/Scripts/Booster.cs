@@ -52,7 +52,7 @@ public class Booster : MonoBehaviour
     private void OnTxSuccess(string transactionHash)
     {
         UnitonConnectLogger.Log("Use laser success, hash: " + transactionHash);
-        PlayerStatsManager.Instance.AddLaser(-1);
+        //PlayerStatsManager.Instance.AddLaser(-1);
         Cleanup();
 
         //PlayerStatsManager.Instance.heart--; 
