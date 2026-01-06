@@ -92,6 +92,9 @@ public class Game : MonoBehaviour
     private int floodingCount;
     private decimal tonCoin = 0m;
     private bool isFlooding = false;
+    private float timeDig;
+    private float probalitygold;
+    private float probalitydiamond;
 
     private void OnValidate()
     {
@@ -108,11 +111,11 @@ public class Game : MonoBehaviour
 
     public void NewGame()
     {
-        if (Game.Instance._userDatas.heart <= 0) 
+        /*if (Game.Instance._userDatas.heart <= 0) 
         {
             gameoverscreen.SetActive(true);
             OutOfHeartScreen.SetActive(true);
-        }          
+        }*/          
             
         StopAllCoroutines();
         if (_world != null)
@@ -132,6 +135,12 @@ public class Game : MonoBehaviour
         generated = false;
         
         holdTime = 0f;
+        timeDig = 2 - PlayerStatsManager.Instance.levelDig * 0.5f;
+        probalitygold = 15 + 10 + 5 * PlayerStatsManager.Instance.levelOre;
+        if (PlayerStatsManager.Instance.levelOre > 1)
+            probalitydiamond = 4 + 3; //+3%
+        else
+            probalitydiamond = 4;
 
         grid = new CellGrid(width, height);
         board.InitiateDraw(grid, rockCount);
@@ -149,9 +158,10 @@ public class Game : MonoBehaviour
 
     public void SetLevel()
     {
-        if(_userDatas.level < 14)
+        Debug.Log("Skip logic set level");
+        /*if(_userDatas.level < 14)
         _userDatas.level++;
-        SaveData();
+        SaveData();*/
     } 
     
         
@@ -205,7 +215,7 @@ public class Game : MonoBehaviour
             if (Input.GetMouseButtonUp(0))
             {
 
-                if (holdTime < _userDatas.timedig)
+                if (holdTime < /*_userDatas.timedig*/timeDig)
                 {
                     Flag();
                 }
@@ -219,7 +229,7 @@ public class Game : MonoBehaviour
             if (isMouseButtonDown)
             {
                 holdTime += Time.deltaTime;
-                if (holdTime >= _userDatas.timedig)
+                if (holdTime >= /*_userDatas.timedig*/timeDig)
                 {
                     Reveal();
                 }
@@ -285,6 +295,7 @@ public class Game : MonoBehaviour
             default:
                 cell.revealed = true;
                 CollectOre(cell);
+
                 CheckWinCondition();
                 break;
         }
@@ -453,9 +464,9 @@ public class Game : MonoBehaviour
         else
         textcomplete.text = (totalarea / sumarea * 100).ToString("F2") + "%";
         gameoverscreen.SetActive(true);
-        _userDatas.heart--;
-        SaveData();
-        Lives.Instance.LoseHeart();
+        //_userDatas.heart--;
+        //SaveData();
+        //Lives.Instance.LoseHeart();
     }
     
     private void CheckWinCondition()
@@ -468,6 +479,7 @@ public class Game : MonoBehaviour
 
                 // All non-mine cells must be revealed to have won
                 if (cell.type != Cell.Type.Mine && !cell.revealed) {
+                    CheckReward(); //check reward when not win
                     return; // no win
                 }
             }
@@ -522,9 +534,9 @@ public class Game : MonoBehaviour
     {
         int bonusgold = 0, bonusdiamond = 0;
         int dice = Random.Range(1, probality);
-        if (dice <= _userDatas.probalitygold)
+        if (dice <= /*_userDatas.probalitygold*/probalitygold)
             bonusgold = Random.Range(0, 5);
-        if (dice <= _userDatas.probalitydiamond)
+        if (dice <= /*_userDatas.probalitydiamond*/probalitydiamond)
             bonusdiamond = Random.Range(0, 2);
 
         for(int i = 0; i < bonusgold; i++)
@@ -596,8 +608,26 @@ public class Game : MonoBehaviour
 
     public void GetRewardWin() //get reward win and backhome
     {
+        long nanoAmount = 100_000_000;
+        Debug.Log($"Get reward win: {nanoAmount}");
 
-        BackToHome();  
+        //{ } + ($) -> {{ }}
+        string jsonParams = $"{{\"amountReward\": {nanoAmount}}}";
+        UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleGetRewardWinResult, "claim_reward", jsonParams);
+    }
+    private void HandleGetRewardWinResult(bool isSuccess)
+    {
+        if (isSuccess)
+        {
+            UnitonConnectSDK.Instance.LoadBalance();
+            UnitonConnectLogger.Log("Get Reward Win success");
+
+            BackToHome();
+        }
+        else
+        {
+            UnitonConnectLogger.Log("Get Reward Win failed");
+        }
     }
 
     public void DropReward()

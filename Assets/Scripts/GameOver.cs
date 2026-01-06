@@ -8,7 +8,7 @@ public class GameOver : MonoBehaviour
     {
         if(Game.Instance.OutOfHeartScreen.activeSelf == false)
         {
-            if (Game.Instance._userDatas.heart > 0)
+            if (/*Game.Instance._userDatas.heart*/PlayerStatsManager.Instance.heart > 0)
             {
                 Game.Instance.NewGame();
                 gameObject.SetActive(false);
@@ -18,7 +18,7 @@ public class GameOver : MonoBehaviour
                 Game.Instance.OutOfHeartScreen.SetActive(true);
             }
         }    
-        else
+        /*else
         {
             if(Game.Instance._userDatas.diamond >= 1)
             {
@@ -29,7 +29,7 @@ public class GameOver : MonoBehaviour
                 Game.Instance._userDatas.heart++;
                 Game.Instance.SaveData();
             }   
-        }    
+        }*/    
     }
     public void NextLevel()
     {
