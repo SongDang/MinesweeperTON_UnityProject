@@ -22,8 +22,8 @@ public class LevelSelectionManager : MonoBehaviour
 
         //loading
 
-        UnitonConnectSDK.Instance.OnTonTransactionSended += OnTxSuccess;
-        UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnTxFailed;
+        //UnitonConnectSDK.Instance.OnTonTransactionSended += OnTxSuccess;
+        //UnitonConnectSDK.Instance.OnTonTransactionSendFailed += OnTxFailed;
 
         string jsonParams = "{\"qty\": 1}"; //1 item
         UnitonConnectSDK.Instance.SendSmartContractTransaction(HandleUseHeartResult, "use_heart", jsonParams);
@@ -35,6 +35,7 @@ public class LevelSelectionManager : MonoBehaviour
         {
             PlayerStatsManager.Instance.AddHeart(-1);
             UnitonConnectLogger.Log("Use heart success, heart - 1");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("GamePlay");
         }
         else
         {
@@ -42,7 +43,7 @@ public class LevelSelectionManager : MonoBehaviour
         }
     }
 
-    private void OnTxFailed(string errorMsg)
+    /*private void OnTxFailed(string errorMsg)
     {
         UnitonConnectLogger.LogError("Start level failed: " + errorMsg);
 
@@ -73,5 +74,5 @@ public class LevelSelectionManager : MonoBehaviour
     private void OnDestroy()
     {
         Cleanup();
-    }
+    }*/
 }

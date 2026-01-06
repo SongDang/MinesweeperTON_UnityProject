@@ -1214,22 +1214,41 @@ const tonConnectBridge = {
 
             retryWithBackoff(makeRequest, 3, 1000)
             .then(function(data) {
-                console.log('[Uniton Connect] Price Response:', data);
+                console.log('[Uniton Connect] Response for ' + methodName + ':', data);
 
-                var price = 0;
+                var finalResultString = "0"; 
+
                 if (data.ok && data.result && data.result.exit_code === 0) {
-                    if (data.result.stack && data.result.stack.length > 0) {
-                        var stackItem = data.result.stack[0];
-                        if (stackItem[0] === 'num') {
-                            price = parseInt(stackItem[1], 16);
+                    var stack = data.result.stack;
+
+                    if (methodName === 'get_all_prices') {
+                        var resultObj = {
+                            priceHeart: "0", priceLaser: "0", priceGold: "0",
+                            priceDiamond: "0", priceWin: "0", priceUpgrade: "0"
+                        };
+            
+                        var keys = ["priceHeart", "priceLaser", "priceGold", "priceDiamond", "priceWin", "priceUpgrade"];
+
+                        if (stack && stack.length > 0) {
+                            for (var i = 0; i < keys.length; i++) {
+                                if (i < stack.length && stack[i][0] === 'num') {
+                                    resultObj[keys[i]] = parseInt(stack[i][1], 16).toString();
+                                }
+                            }
+                        }
+                        finalResultString = JSON.stringify(resultObj);
+                    }    
+                    else {
+                        if (stack && stack.length > 0 && stack[0][0] === 'num') {
+                            finalResultString = parseInt(stack[0][1], 16).toString();
                         }
                     }
                 } else {
                     console.warn('[Uniton Connect] Failed exit code:', data.result ? data.result.exit_code : 'N/A');
                 }
 
-                var priceStr = price.toString();
-                var strPtr = tonConnect.allocString(priceStr);
+                console.log('[Uniton Connect] Returning to C#:', finalResultString);
+                var strPtr = tonConnect.allocString(finalResultString);
                 {{{ makeDynCall('vi', 'callback') }}}(strPtr);
                 _free(strPtr);
             })
