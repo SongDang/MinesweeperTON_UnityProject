@@ -248,9 +248,8 @@ public class UpgradeTree : MonoBehaviour
         else
         {
             UnitonConnectLogger.Log("Buy upgrade failed");
+            btnConfirm.interactable = true;
         }
-
-        btnConfirm.interactable = true;
     }
     private void OnUpgradeSuccess()
     {

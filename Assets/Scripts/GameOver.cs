@@ -10,21 +10,21 @@ public class GameOver : MonoBehaviour
     public GameObject shop;
     public void PlayAgain()
     {
-        if(Game.Instance.OutOfHeartScreen.activeSelf == false)
+        if (PlayerStatsManager.Instance.heart > 0)
         {
-            if (/*Game.Instance._userDatas.heart*/PlayerStatsManager.Instance.heart > 0)
-            {
-                StartLevel();
-            }
-            else
+            StartLevel();
+        }
+        else
+        {
+            if (!Game.Instance.OutOfHeartScreen.activeSelf)
             {
                 Game.Instance.OutOfHeartScreen.SetActive(true);
             }
-        }  
-        else
-        {
-            shop.SetActive(true);
-        }    
+            else
+            {
+                shop.SetActive(true);
+            }
+        }
         /*else
         {
             if(Game.Instance._userDatas.diamond >= 1)
@@ -36,7 +36,7 @@ public class GameOver : MonoBehaviour
                 Game.Instance._userDatas.heart++;
                 Game.Instance.SaveData();
             }   
-        }*/    
+        }*/
     }
     
     public void StartLevel()
