@@ -142,7 +142,7 @@ public class Game : MonoBehaviour
         else
             probalitydiamond = 4;
 
-        UnitonConnectLogger.Log($"levelDig: {timeDig}, probalitygold: {probalitygold}, probalitydiamond: {probalitydiamond}");
+        UnitonConnectLogger.Log($"timeDig: {timeDig}, probalitygold: {probalitygold}, probalitydiamond: {probalitydiamond}");
 
         grid = new CellGrid(width, height);
         board.InitiateDraw(grid, rockCount);
@@ -181,6 +181,7 @@ public class Game : MonoBehaviour
             
         }
         AdjustText();
+        CheckReward();
     }
 
     public void RevealAndFlag()
@@ -375,7 +376,6 @@ public class Game : MonoBehaviour
     public void CheckAfterFlooding()
     {
         isFlooding = false;
-        CheckReward();
     }
 
     public bool GetIsFlooding()
@@ -481,7 +481,6 @@ public class Game : MonoBehaviour
 
                 // All non-mine cells must be revealed to have won
                 if (cell.type != Cell.Type.Mine && !cell.revealed) {
-                    CheckReward(); //check reward when not win
                     return; // no win
                 }
             }
@@ -563,6 +562,7 @@ public class Game : MonoBehaviour
 
     public void CheckReward()
     {
+        if (isFlooding) return;
         if (rewardPopup.activeSelf) return;
 
         if (goldCount > 0 || diamondCount > 0)

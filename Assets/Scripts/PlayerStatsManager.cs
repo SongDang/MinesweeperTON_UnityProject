@@ -224,16 +224,19 @@ public class PlayerStatsManager : MonoBehaviour
     {
         levelDig++;
         OnLevelDigUpdated?.Invoke(levelDig);
+        UnitonConnectLogger.Log($"On Level Dig Updated: {levelDig}");
     }
     public void LevelUpHeart()
     {
         levelHeart++;
         OnLevelHeartUpdated?.Invoke(levelHeart);
+        UnitonConnectLogger.Log($"On Level Heart Updated: {levelHeart}");
     }
     public void LevelUpOre()
     {
         levelOre++;
         OnLevelOreUpdated?.Invoke(levelOre);
+        UnitonConnectLogger.Log($"On Level Ore Updated: {levelOre}");
     }
     public void SetlastTimeReceiveHeart(int time)
     {

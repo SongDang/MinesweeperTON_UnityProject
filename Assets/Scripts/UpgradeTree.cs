@@ -179,6 +179,8 @@ public class UpgradeTree : MonoBehaviour
 
                 buttons[i].interactable = canUpgrade;
 
+                UnitonConnectLogger.Log($"Set button state, button i: {i}, currentLevel: {currentLevel}");
+
                 //change color
                 if (isUpgraded)
                     buttons[i].image.color = Color.green;
