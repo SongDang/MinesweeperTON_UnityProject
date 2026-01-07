@@ -579,6 +579,7 @@ public class Game : MonoBehaviour
 
         goldCount = 0;
         diamondCount = 0;
+        tonCoin = 0;
 
         holdTime = 0f;
 
@@ -634,16 +635,16 @@ public class Game : MonoBehaviour
 
     public void DropReward()
     {
-        goldCount = 0;
-        diamondCount = 0;
-        holdTime = 0f;
-        tonCoin = 0m;
-
         surePopup.SetActive(true);
     }
 
     public void OnclickYesSure()
     {
+        goldCount = 0;
+        diamondCount = 0;
+        holdTime = 0f;
+        tonCoin = 0m;
+
         if (rewardPopup.activeSelf)
             rewardPopup.SetActive(false); //drop dig
         else if(gamewinscreen.activeSelf)
