@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class GameOver : MonoBehaviour
 {
+    public GameObject shop;
     public void PlayAgain()
     {
         if(Game.Instance.OutOfHeartScreen.activeSelf == false)
@@ -22,7 +23,7 @@ public class GameOver : MonoBehaviour
         }  
         else
         {
-
+            shop.SetActive(true);
         }    
         /*else
         {
@@ -37,6 +38,7 @@ public class GameOver : MonoBehaviour
             }   
         }*/    
     }
+    
     public void StartLevel()
     {
         if (!UnitonConnectSDK.Instance.IsWalletConnected)

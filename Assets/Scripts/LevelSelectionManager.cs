@@ -30,6 +30,7 @@ public class LevelSelectionManager : MonoBehaviour
         {
             UnitonConnectLogger.Log("Not enough heart");
             //pop up
+            StartCoroutine(ShowText(3f));
             return;
         }
 
@@ -53,7 +54,6 @@ public class LevelSelectionManager : MonoBehaviour
         else
         {
             UnitonConnectLogger.Log("Use heart failed");
-            StartCoroutine(ShowText(3f));
         }
     }
     

@@ -254,7 +254,7 @@ public class UpgradeTree : MonoBehaviour
     }
     private void OnUpgradeSuccess()
     {
-        AudioManager.Instance.WinSound();
+        //AudioManager.Instance.WinSound(); //null
 
         switch (selectedType)
         {

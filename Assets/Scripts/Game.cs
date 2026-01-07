@@ -637,6 +637,7 @@ public class Game : MonoBehaviour
         goldCount = 0;
         diamondCount = 0;
         holdTime = 0f;
+        tonCoin = 0m;
 
         surePopup.SetActive(true);
     }

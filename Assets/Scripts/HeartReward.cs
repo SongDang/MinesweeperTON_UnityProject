@@ -37,7 +37,7 @@ public class HeartReward : MonoBehaviour
 
             DateTime nextDate = DateTimeOffset.FromUnixTimeSeconds(nextClaimTime).LocalDateTime;
 
-            timeText.text = $"Come back at {nextDate.ToString("HH:mm")}";
+            timeText.text = $"Come back at\n{nextDate.ToString("HH:mm dd/MM/yyyy")}";
         }
     }
 
