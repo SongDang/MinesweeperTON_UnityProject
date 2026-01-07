@@ -142,6 +142,8 @@ public class Game : MonoBehaviour
         else
             probalitydiamond = 4;
 
+        UnitonConnectLogger.Log($"levelDig: {timeDig}, probalitygold: {probalitygold}, probalitydiamond: {probalitydiamond}");
+
         grid = new CellGrid(width, height);
         board.InitiateDraw(grid, rockCount);
 

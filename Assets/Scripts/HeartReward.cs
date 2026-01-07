@@ -27,7 +27,8 @@ public class HeartReward : MonoBehaviour
 
         if (lastTime == 0 || currentTime >= nextClaimTime)
         {
-            timeText.text = "Your gift is ready!";
+            string heartReward = (2 + PlayerStatsManager.Instance.levelHeart).ToString();
+            timeText.text = "Your gift is ready! +" + heartReward;
             getButton.interactable = true;
         }
         else
