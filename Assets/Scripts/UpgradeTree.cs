@@ -174,10 +174,12 @@ public class UpgradeTree : MonoBehaviour
         {
             if (buttons[i] != null)
             {
-                bool canUpgrade = (currentLevel == i);
+                bool canUpgrade = (currentLevel == i); //lv 0,1,2 => button 0,1
                 bool isUpgraded = (currentLevel > i);
 
                 buttons[i].interactable = canUpgrade;
+
+                UnitonConnectLogger.Log($"Set button state, button i: {i}, currentLevel: {currentLevel}");
 
                 //change color
                 if (isUpgraded)
@@ -246,13 +248,12 @@ public class UpgradeTree : MonoBehaviour
         else
         {
             UnitonConnectLogger.Log("Buy upgrade failed");
+            btnConfirm.interactable = true;
         }
-
-        btnConfirm.interactable = true;
     }
     private void OnUpgradeSuccess()
     {
-        AudioManager.Instance.WinSound();
+        //AudioManager.Instance.WinSound(); //null
 
         switch (selectedType)
         {

@@ -32,7 +32,7 @@ public class Menu : MonoBehaviour
     {
         if(UnitonConnectSDK.Instance.IsWalletConnected)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Home");
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LoadingPage");
         }
         else
         {

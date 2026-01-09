@@ -23,6 +23,7 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
+        UpdateBalanceText(sdk.TonBalance);
         sdk.OnTonBalanceClaimed += UpdateBalanceText;
 
         GenerateShopItems();
@@ -98,7 +99,7 @@ public class ShopManager : MonoBehaviour
     public void OpenShop()
     {
         gameObject.SetActive(true);
-
+        UnitonConnectLogger.Log("Open shop");
         UpdateBalanceText(sdk.TonBalance);
     }
     public void CloseShop()
